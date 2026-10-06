@@ -1,0 +1,724 @@
+.App {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 10px;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+
+  background-color: #222;
+  color: white;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  position: relative;
+  overflow: hidden;
+}
+.App::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    backdrop-filter: blur(3px);
+
+    z-index: 0;
+}
+.App > * {
+    position: relative;
+    z-index: 1;
+}
+.AppBlank {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 10px;
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+
+  color: #222;
+  background: rgba(255, 255, 255, 0.7);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  position: relative;
+  overflow: hidden;
+}
+.AppBlank > * {
+    position: relative;
+    z-index: 1;
+}
+.AppBlank .card {
+    background: linear-gradient(to bottom right, rgba(46, 139, 87, 0.2), rgba(20, 20, 20, 0.2), rgba(30, 144, 255, 0.2));
+}
+.AppBlank .card:hover {
+    background: linear-gradient(to bottom right, rgba(46, 139, 87, 0.3), rgba(30, 144, 255, 0.3));
+    border-color: rgba(46, 139, 87, 0.5);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+}
+.AppBlank .card p {
+    color: gainsboro;
+}
+.AppBlank .principal h1 {
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+.AppBlank .principal > p {
+    color: #333;
+}
+.AppBlank .cabecalho {
+    background: rgba(128, 128, 128, 0.6);
+}
+.AppBlank .cabecalho h1 {
+    color: #222;
+}
+.AppBlank .informacoes {
+    background: rgba(128, 128, 128, 0.6);
+}
+.AppBlank .informacoes:hover {
+    background: rgba(128, 128, 128, 0.8);
+    border-color: rgba(65, 105, 225, 0.6);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+}
+.AppBlank .deleteButton {
+    background: rgba(150, 30, 30, 0.3);
+    color: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(150, 30, 30, 0.6);
+}
+.AppBlank .configurations {
+  background: rgba(128, 128, 128, 0.6);
+}
+.AppBlank .configurations h2 {
+  color: rgba(0, 0, 0, 0.7);
+}
+.AppBlank .confirmSenha {
+  background: rgba(255, 255, 255, 0.2);
+}
+.AppBlank .geradorSenha {
+  background: rgba(255, 255, 255, 0.2);
+}
+.AppBlank .geradorSenha {
+  background: rgba(128, 128, 128, 0.6);
+  color: black;
+}
+.AppBlank .geradorSenha input::placeholder {
+  color: rgba(0, 0, 139, 0.5);
+}
+.AppBlank .geradorSenha input:focus {
+  background: rgba(128, 128, 128, 0.6);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+}
+.AppBlank .confirmSenha {
+  background:rgba(128, 128, 128, 0.6);
+}
+
+.footer {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+}
+
+.beforeCodigo {
+  display: none;
+}
+
+.botoes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 450px;
+  max-width: calc(100% - 40%);
+  padding: 8px;
+  box-sizing: border-box;
+  margin-top: 10px;
+  border-radius: 15px;
+}
+
+.principal {
+  position: relative;
+  width: 90%;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  margin-top: 20px;
+  padding-bottom: 30px;
+} 
+.principal h1 {
+  color: white;
+  margin: 0;
+  font-size: 24px;
+}
+
+.cards {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  animation: appear 0.5s ease-in-out;
+}
+
+.card {
+  position: relative;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  min-height: 210px;
+  padding: 25px;
+  gap: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border-radius: 18px;
+  background: linear-gradient(to bottom right, rgba(46, 139, 87, 0.5), rgba(20, 20, 20, 0.2), rgba(30, 144, 255, 0.5));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease,
+              background 0.3s ease,
+              box-shadow 0.3s ease;
+  z-index: 1;
+}
+.card:hover {
+  transform: translateY(-8px);
+  background: linear-gradient(to bottom right, rgba(46, 139, 87, 0.5), rgba(30, 144, 255, 0.5));
+  border-color: rgba(46, 139, 87, 0.5);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+
+  button {
+    background: rgba(0, 255, 0, 0.25);
+  }
+}
+.card h2 {
+  color: white;
+  margin-top: 0;
+  font-size: 20px;
+}
+.card p {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: normal;
+  text-align: left;
+  line-height: 1.5;
+  flex: 1;
+}
+.card button {
+  width: 100%;
+  background: rgba(46, 139, 87, 0.7);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  margin-top: auto;
+}
+.card button:hover {
+  background: rgba(0, 255, 0, 0.35);
+}
+
+.geradorSenha {
+  left: 50%;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  top: 50%;
+  padding: 30px;
+  gap: 15px;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 18px;
+  background: rgba(20, 20, 20, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+}
+.geradorSenha input {
+  background: rgba(128, 128, 128, 0.5);
+  color: white;
+}
+.geradorSenha input::placeholder {
+  color: slategray;
+}
+.geradorSenha button {
+  width: 50%;
+}
+.geradorSenha input[type="text"] {
+  width: 50%;
+}
+.geradorSenha .botoes button {
+  width: 100%;
+}
+
+.senhasSalvas {
+  left: 50%;
+  top: 50%;
+  padding: 30px;
+  gap: 15px;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 18px;
+  background: rgba(20, 20, 20, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+}
+.senhasSalvas input {
+  background: rgba(47, 79, 79, 0.4);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+.senhasSalvas input:focus {
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.opcoesSenha {
+  width: 100%;
+  padding: 15px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.opcoesSenha label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.opcoesSenha input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.opcoesSenha input[type="checkbox"] {
+  accent-color: darkgreen;
+}
+
+.opcoesSenha input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 10px;
+  border-radius: 4px;
+  background: rgba(0, 128, 0, 0.4);
+  outline: none;
+}
+
+.opcoesSenha input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: darkgreen; 
+  margin-top: -5px;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2); 
+  border-radius: 4px;
+}
+
+.opcoesSenha input[type="range"]::-webkit-progress-bar {
+  width: 18px;
+  height: 25px;
+  border-radius: 50%;
+  background: darkgreen;
+  cursor: pointer;
+}
+
+#Dsenha, #Gsenha {
+  width: 100%;
+  height: 45px;
+  padding: 0 15px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+#divSenhas {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.senhaSalva {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.senhaSalva label {
+  font-size: 18px;
+  font-weight: bold;
+  color: mintcream;
+}
+
+.campoSenha {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.campoSenha input {
+  flex: 1;
+  height: 40px;
+  border-radius: 10px;
+}
+.campoSenha button {
+  width: 45px;
+  height: 40px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+.campoSenha img {
+  width: 20px;
+}
+
+.confirmSenha {
+  left: 50%;
+  top: 45%;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  padding: 25px;
+  gap: 15px;
+  width: 90%;
+  max-width: 500px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 18px;
+  background: rgba(20, 20, 20, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+}
+
+.confirmSenha .botoes button {
+  width: 100%;
+}
+
+.informacoes {
+  left: 50%;
+  top: 50%;
+  padding: 30px;
+  gap: 15px;
+  width: 70%;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  max-width: 500px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 18px;
+  background: rgba(20, 20, 20, 0.5);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+}
+.informacoes input {
+    border-radius: 10px;
+    height: 45px;
+    box-sizing: border-box;
+    padding: 0 5px;
+    gap: 20px;
+    width: 90%;
+    background: rgba(255, 255, 255, 0.05);
+    color: mintcream;
+    font-size: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-bottom: 2px solid rgba(65, 105, 225, 0.4);
+    transition: 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+.informacoes input:focus {
+  outline: none;
+  background: rgba(0, 0, 0, 0.4);
+  border-color: royalblue;
+  box-shadow: 0 0 10px rgba(65, 105, 225, 0.3);
+}
+.informacoes h1 {
+  color: white;
+  margin-top: 0;
+  font-size: 24px;
+}
+.informacoes label {
+  width: 90%;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: bold;
+  text-align: left;
+  line-height: 1.5;
+}
+.informacoes button {
+  width: 100%;
+  background: rgba(65, 105, 225, 0.3);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.informacoes button:hover {
+  background: rgba(65, 105, 225, 0.5);
+}
+
+.geradorSenha, .senhasSalvas, .confirmSenha, .informacoes {
+  position: absolute;
+  z-index: 100;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.configurations {
+  position: absolute;
+  top: 85px;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  right: max(4%, calc((100% - 1100px) /2));
+  width: 280px;
+  padding: 22px;
+  box-sizing: border-box;
+  gap: 12px;
+  display: none;
+  flex-direction: column;
+  border-radius: 18px;
+  background: rgba(20, 20, 20, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+.configurations h2 {
+  color: white;
+  margin-top: 0 0 10px;
+  font-size: 20px;
+  text-align: center;
+}
+.configurations label {
+  width: 100%;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  font-weight: bold;
+  text-align: left;
+  line-height: 1.5;
+}
+.configurations input {
+  border-radius: 10px;
+  height: 35px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  color: mintcream;
+  font-size: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 2px solid rgba(65, 105, 225, 0.4);
+  transition: 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+}
+.configurations input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.configurations input:focus {
+  outline: none;
+  background: rgba(0, 0, 0, 0.4);
+  border-color: royalblue;
+  box-shadow: 0 0 10px rgba(65, 105, 225, 0.3);
+}
+
+.createButton {
+  width: 100%;
+  background: rgba(255, 215, 0, 0.3);
+  color: black;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.createButton:hover {
+  background: rgba(255, 215, 0, 0.5);
+}
+.saveButton {
+  width: 100%;
+  background: rgba(72, 61, 139, 0.3);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.saveButton:hover {
+  background: rgba(65, 105, 225, 0.5);
+}
+.imgButton {
+  width: 100%;
+  background: rgba(46, 139, 87, 0.3);
+  color: white;
+  border: 1px solid rgba(46, 139, 87, 0.7);
+}
+.imgButton:hover {
+  background: rgba(46, 139, 87, 0.5);
+}
+.delImgButton {
+  width: 100%;
+  background: rgba(150, 30, 30, 0.2);
+  color: white;
+  border: 1px solid rgba(150, 30, 30, 0.7);
+}
+.delImgButton:hover {
+  background: rgba(150, 30, 30, 0.5);
+}
+.themeButton {
+  width: 100%;
+  align-items: center;
+  background: rgba(128, 128, 128, 0.3);
+  color: white;
+  border: 1px solid rgba(128, 128, 128, 0.7);
+}
+.themeButton:hover {
+  background: rgba(128, 128, 128, 0.5);
+}
+
+.deleteButton {
+  width: 100%;
+  align-items: center;
+  background: rgba(150, 30, 30, 0.1);
+  color: rgba(150, 30, 30, 0.7);
+  border: 1px solid rgba(150, 30, 30, 0.6);
+}
+.deleteButton:hover {
+  background: rgba(150, 30, 30, 0.3);
+  color: black;
+}
+
+.closeButton {
+  width: 100%;
+  background: rgba(150, 30, 30, 0.7);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.configButton, .editButton {
+   width: 45px;
+   height: 45px;
+   padding: 5px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background: transparent;
+   border: 1px solid transparent;
+   border-radius: 40%;
+   transition: 0.3s ease;
+   cursor: pointer;
+}
+.configButton:hover, .editButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+.configButton img, .editButton img {
+  width: 25px;
+  height: 25px;
+  margin: 0;
+  background: transparent;
+}
+.configButton:hover {
+  transform: rotate(90deg) scale(1.02);
+}
+.editButton:hover {
+  opacity: 0.8;
+  transform: scale(1.02);
+}
+.cabecalho {
+  width: min(1100px, 92%);
+  min-height: 65px;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  padding: 10px 20px;
+  border-radius: 15px;
+  background: linear-gradient(to bottom right, rgba(30, 144, 255, 0.4), rgba(46, 139, 87, 0.4));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+.cabecalho h1 {
+  color: white;
+  margin: 0;
+  font-size: 24px;
+}
+.cabecalho .botoes {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 8px;
+}
+
+.logout {
+  width: 160px;
+  margin-top: 5px;
+  background: rgba(120, 30, 30, 0.6);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+.logout:hover {
+  background: rgba(150, 30, 30, 0.8);
+  transform: translateY(-5px);
+}
+
+img {
+  width: 20px;
+  height: 20px;
+}
+
+.cImg {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+}
+
+.LCEImg {
+  filter: invert(100%);
+}
+
+@media (max-width: 480px) {
+  .cards {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .card {
+    width: 100%;
+  }
+  .informacoes {
+    width: 90%;
+    margin: 0;
+  }
+  .confirmSenha {
+    width: 90%;
+    margin: 0;
+  }
+  .geradorSenha .botoes {
+    max-width: 90%;
+  }
+}

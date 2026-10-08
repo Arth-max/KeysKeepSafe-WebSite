@@ -141,6 +141,19 @@ function Tela() {
         document.getElementById('msgCS').textContent = ''
     }
 
+    //Restringe urls para apenas requisições http e https
+    function validarImagem(url) {
+        try {
+            const parseUrl = new URL(url)
+
+            return (
+                parseUrl.protocol === 'http:' || parseUrl.protocol === 'https:' 
+            )
+        } catch (error) {
+            return false
+        }
+    }
+
     //Funções relacionadas a API\\
     //Função para mudar a imagem de fundo(API)
     async function changeImg() {
@@ -148,6 +161,13 @@ function Tela() {
 
         if (!img.trim()) { return; }
 
+        if (!validarImagem(img)) {
+            document.getElementById('msgImg').style.color = 'darkred'
+            document.getElementById('msgImg').textContent = "URL inválida"
+            return
+        }
+
+        ///verifica se a url é válida
         try {
             new URL(img)
         } catch (error) {

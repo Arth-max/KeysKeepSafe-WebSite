@@ -40,10 +40,23 @@ public class UsuarioController {
         }
     }
 
-    @PostMapping("/image")
+   @PostMapping("/image")
     public ResponseEntity<Void> salvarImagem(@RequestParam String imagemUrl, Authentication authentication) {
         User usuario = (User) authentication.getPrincipal();
-        usuarioService.salvarImagem(imagemUrl, usuario.getEmail());
+        String urLower = imagemUrl.toLowerCase();
+        boolean extensaoV = EXTENSOES.stream().anyMatch(urLower::endsWith);
+
+        if (!extensaoV) {
+            return ResponseEntity.status(415).build();
+        }
+
+        try {
+            new URL(imagemUrl);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        usuarioService.salvarImagem(imagemUrl, usuario.getNome());
         return ResponseEntity.ok().build();
     }
 

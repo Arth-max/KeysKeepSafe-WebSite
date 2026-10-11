@@ -34,6 +34,19 @@ API.interceptors.request.use(
     }
 )
 
+//Restringe urls para apenas requisições http e https
+export function validarImagem(url) {
+        try {
+            const parseUrl = new URL(url)
+
+            return (
+                parseUrl.protocol === 'http:' || parseUrl.protocol === 'https:' 
+            )
+        } catch (error) {
+            return "URL inválida " + error
+        }
+    }
+
 export function closeInputs() {
     document.getElementById('codigo').style.display = 'none'
     document.getElementById('Nsenha').style.display = 'none'

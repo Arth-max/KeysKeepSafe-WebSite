@@ -234,7 +234,10 @@ function Home() {
 
       {/* Tela Login */}
       <form className='login' style={{ display: tela === 'login' ? 'flex' : 'none' }}>
-        <h1><img className="logoImg" src={Logo} alt="" /> KeysKeepSafe</h1>
+        <div className='title'>
+          <img className="logoImg" src={Logo} alt="" /> 
+          <h1>KeysKeepSafe</h1>
+        </div>
         <h2>Login</h2>
         <input name="name" type="text" placeholder='Nome' ref={inputName} />
 
@@ -242,14 +245,17 @@ function Home() {
           <input name="senha" type={VerSenha ? 'text' : 'password'} placeholder='Senha' ref={inputSenha} />
           <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
         </div>
-        <a onClick={forgotPassword} className='a-forgotPass'>Esqueci minha senha</a>
+        <a onClick={forgotPassword} className='a-forgotPass' role="button">Esqueci minha senha</a>
         <button type="button" className='btn-login' onClick={findUsers} disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
         <p id="msgLogin"></p>
       </form>
 
       {/* Tela Cadastro */}
       <form className='cadastro' style={{ display: tela === 'cadastro' ? 'flex' : 'none' }}>
-        <h1><img className="logoImg" src={Logo} alt="" /> KeysKeepSafe</h1>
+        <div className='title'>
+          <img className="logoImg" src={Logo} alt="" /> 
+          <h1>KeysKeepSafe</h1>
+        </div>
         <h2>Cadastro</h2>
         <input name="name" type="text" placeholder='Nome' ref={CinputName} />
         <input name="Email" type="email" placeholder='Email' ref={CinputEmail} />
@@ -264,7 +270,10 @@ function Home() {
 
       {/* Tela Esqueci Senha */}
       <form className='forgotPass' style={{ display: tela === 'esqueciSenha' ? 'flex' : 'none' }}>
-        <h1><img className="logoImg" src={Logo} alt="" /> KeysKeepSafe</h1>
+        <div className='title'>
+          <img className="logoImg" src={Logo} alt="" /> 
+          <h1>KeysKeepSafe</h1>
+        </div>
         <h2>Redefinir senha</h2>
         <input id='email' name="Email" type="email" placeholder='Digite seu Email' ref={Email} />
 

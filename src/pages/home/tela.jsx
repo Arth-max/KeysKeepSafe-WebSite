@@ -11,6 +11,7 @@ import desverSenha from '../../assets/desverSenha.png'
 import verSenha from '../../assets/verSenha.png'
 import Logo from '../../assets/senha.png'
 import API from '../../hooks/user.js'
+import validarImagem from '../../hooks/user.js'
 import { useState, useRef, useEffect } from 'react'
 import Footer from '../../components/Footer/Footer.jsx'
 
@@ -139,19 +140,6 @@ function Tela() {
         document.getElementById('Csenha').value = ''
         document.getElementById('msgCS').style.display = 'flex'
         document.getElementById('msgCS').textContent = ''
-    }
-
-    //Restringe urls para apenas requisições http e https
-    function validarImagem(url) {
-        try {
-            const parseUrl = new URL(url)
-
-            return (
-                parseUrl.protocol === 'http:' || parseUrl.protocol === 'https:' 
-            )
-        } catch (error) {
-            return false
-        }
     }
 
     //Funções relacionadas a API\\
@@ -413,7 +401,7 @@ function Tela() {
             {/* Cabeçalho */}
             <header className="cabecalho">
                 <img className="cImg" src={Logo} alt="" /> 
-                <h1>KeysKeepSafe Site</h1>
+                <h1>KeysKeepSafe</h1>
                 <div className="botoes">
                     <button className="editButton" onClick={mudarTema}><img src={Edit} alt="Mudar Tema"/></button>
                     <button className="configButton" onClick={abrirConfig}><img src={Config} alt="Configurações"/></button>
@@ -429,7 +417,7 @@ function Tela() {
 
             {/* Mudar imagem de fundo */}
             <div id="changeTheme" className="configurations" style={{ display: changeTheme ? 'flex' : 'none' }}>
-                <label>Mudar Imagem de fundo</label>
+                <label htmlFor="imgUrl">Mudar Imagem de fundo</label>
                 <input id="imgUrl" type="url" placeholder="Url da imagem" value={img} onChange={(e) => setImg(e.target.value)} />
                 {img.trim() !== '' && <button id="ApImg" className="imgButton" onClick={changeImg}> Aplicar </button>}
                 {backgroundImg && <button id="DelImg" className="delImgButton" onClick={removeImg}> Remover Imagem </button>}

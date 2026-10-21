@@ -3,10 +3,9 @@ import verSenha from '../../assets/verSenha.png'
 import desverSenha from '../../assets/desverSenha.png'
 import Logo from '../../assets/senha.png'
 import './Login.css'
-import { useState, useRef, useEffect } from 'react'
-import API from '../../hooks/user.js'
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { closeInputs } from '../../hooks/user.js'
+import API, { OpenCloseInputs, OpenCloseDiv, setMsg, clearMsg, clearInputs } from '../../hooks/user.js'
 import Footer from '../../components/Footer/Footer.jsx'
 
 function Home() {
@@ -35,25 +34,25 @@ function Home() {
     setTela('login')
     document.getElementById('btnLogin').classList.add('btn-clicked')
     document.getElementById('btnCadastro').classList.remove('btn-clicked')
-    document.getElementById('email').value = ''
-    document.getElementById('msgEsqueciSenha').textContent = ""
-    document.getElementById('msgCadastro').textContent = ""
-    document.getElementById('EnvEmail').style.display = 'block'
-    document.getElementById('pass').style.display = 'none'
+    clearInputs('email')
+    clearMsg('msgEsqueciSenha')
+    clearMsg('msgCadastro')
+    OpenCloseInputs('EnvEmail', 'open')
+    OpenCloseInputs('pass', 'close')
   }
   //ativar tela cadastro
   function telaCadastro() {
     setTela('cadastro')
     document.getElementById('btnLogin').classList.remove('btn-clicked')
     document.getElementById('btnCadastro').classList.add('btn-clicked')
-    document.getElementById('msgLogin').textContent = ""
+    clearMsg('msgLogin')
   }
   //ativar tela esqueci senha
   function forgotPassword() {
     setTela('esqueciSenha')
-    document.getElementById('msgLogin').textContent = ""
-    document.getElementById('msgCadastro').textContent = ""
-    document.getElementById('email').style.display = 'block'
+    clearMsg('msgLogin')
+    clearMsg('msgCadastro')
+    OpenCloseInputs('email', 'open')
   }
   //função para mostrar senha
   function mostrarSenha() {
@@ -76,7 +75,7 @@ function Home() {
       const senha = inputSenha.current.value
 
       if (nome == '' || senha == '') {
-        alert("Usuário nao encontrado, Por favor digite todos os campos")
+        setMsg('msgLogin', 'Por favor digite todos os campos', 'erro')
         setLoading(false)
         return
       }
@@ -88,8 +87,7 @@ function Home() {
 
       sessionStorage.setItem('token', response.data.token)
       
-      document.getElementById('msgLogin').style.color = 'seagreen'
-      document.getElementById('msgLogin').textContent = "validado com sucesso"
+      setMsg('msgLogin', 'Validado com sucesso', 'sucesso')
 
       inputName.current.value = ''
       inputSenha.current.value = ''
@@ -100,8 +98,7 @@ function Home() {
         }
       })
     } catch (error) {
-      document.getElementById('msgLogin').style.color = 'darkred'
-      document.getElementById('msgLogin').textContent = "Por favor, revise se todos os campos estão corretos"
+      setMsg('msgLogin', 'Por favor revise se todos os campos estão corretos', 'erro')
     } finally {
       setLoading(false)
     }
@@ -111,20 +108,17 @@ function Home() {
   async function createUsers() {
     setLoading(true)
     if (CinputName.current.value === "" || CinputEmail.current.value === "" || CinputSenha.current.value === "") {
-      document.getElementById('msgCadastro').style.color = 'darkred'
-      document.getElementById('msgCadastro').textContent = "Por favor digite todos os campos"
+      setMsg('msgCadastro', 'Por favor digite todos os campos', 'erro')
       setLoading(false)
       return
     }
     if (CinputSenha.current.value.length < 8) {
-      document.getElementById('msgCadastro').style.color = 'darkred'
-      document.getElementById('msgCadastro').textContent = "Senha inválida, deve conter ao menos 8 caracteres"
+      setMsg('msgCadastro', 'Senha inválida, digite ao menos 8 caracteres', 'erro')
       setLoading(false)
       return
     }
     if (!validarSenha(CinputSenha.current.value)) {
-      document.getElementById('msgCadastro').style.color = 'darkred'
-      document.getElementById('msgCadastro').textContent = "Senha inválida, por favor digite uma senha forte: (A-Z, a-z, 0-9, !)"
+      setMsg('msgCadastro', 'Senha inválida, por favor digite uma senha forte: (A-Z, a-z, 0-9, !)', 'erro')
       setLoading(false)
       return
     }
@@ -135,16 +129,14 @@ function Home() {
           email: CinputEmail.current.value,
           senha: CinputSenha.current.value
         })
-        document.getElementById('msgCadastro').style.color = 'seagreen'
-        document.getElementById('msgCadastro').textContent = "Usuário cadastrado com sucesso!"
+        setMsg('msgCadastro', 'Usuário cadastrado com sucesso', 'sucesso')
 
         CinputName.current.value = ''
         CinputEmail.current.value = ''
         CinputSenha.current.value = ''
         setLoading(false)
     } catch (error) {
-        document.getElementById('msgCadastro').style.color = 'darkred'
-        document.getElementById('msgCadastro').textContent = "Usuário não cadastrado, por favor tente novamente"
+        setMsg('msgCadastro', 'Usuário não cadastrado, por favor tente novamente', 'erro')
     } finally {
       setLoading(false)
     }
@@ -155,25 +147,23 @@ function Home() {
     setLoading(true)
     const email = Email.current.value;
     if (email === '') {
-        document.getElementById('msgEsqueciSenha').textContent = "Por favor digite um email"
+        setMsg('msgEsqueciSenha', 'por favor digite um email', 'erro')
         setLoading(false)
         return
     }
     setLoading(true)
     try {
         await API.post('/usuario/recuperar-senha?email=' + email)
-        document.getElementById('EnvEmail').style.display = 'none'
-        document.getElementById('email').style.display = 'none'
-        document.getElementById('codigo').style.display = 'block'
-        document.getElementById('Nsenha').style.display = 'block'
-        document.getElementById('UpPass').style.display = 'block'
-        document.getElementById('pass').style.display = 'flex'
+        OpenCloseInputs('EnvEmail', 'close')
+        OpenCloseInputs('email', 'close')
+        OpenCloseInputs('codigo', 'open')
+        OpenCloseInputs('Nsenha', 'open')
+        OpenCloseInputs('UpPass', 'open')
+        OpenCloseDiv('pass', 'open')
 
-        document.getElementById('msgEsqueciSenha').style.color = 'seagreen'
-        document.getElementById('msgEsqueciSenha').textContent = "Um codigo foi enviado para o seu email"
+        setMsg('msgEsqueciSenha', 'Um código foi enviado para o seu email', 'sucesso')
     } catch (error) {
-        document.getElementById('msgEsqueciSenha').style.color = 'darkred'
-        document.getElementById('msgEsqueciSenha').textContent = "email não cadastrado ou inválido"
+        setMsg('msgCadastro', 'email não cadastrado ou inválido', 'erro')
     } finally {
         setLoading(false)
     }
@@ -187,17 +177,17 @@ function Home() {
     setLoading(true)
 
     if (cod === '') {
-      console.log("Usuário nao atualizado, Por favor digite o codigo")
+      setMsg('msgEsqueciSenha', 'Usuário não cadastrado, por favor digite o codigo', 'erro')
       setLoading(false)
       return
     }
     if (Nsenha.length < 8) {
-      document.getElementById('msgEsqueciSenha').textContent = "Digite uma senha com ao menos 8 caracteres"
+      setMsg('msgEsqueciSenha', 'Senha inválida, por favor digite uma senha com ao menos 8 caracteres', 'erro')
       setLoading(false)
       return
     }
     if (!validarSenha(Nsenha)) {
-      document.getElementById('msgEsqueciSenha').textContent = "Senha inválida, por favor digite uma senha forte: (A-Z, a-z, 0-9, !)"
+      setMsg('msgEsqueciSenha', 'Senha inválida, por favor digite uma senha forte: (A-Z, a-z, 0-9, !)', 'erro')
       setLoading(false)
       return
     }
@@ -209,27 +199,25 @@ function Home() {
       codigo.current.value = ''
       NinputSenha.current.value = ''
 
-      closeInputs()
-      document.getElementById('msgEsqueciSenha').style.color = 'seagreen'
-      document.getElementById('msgEsqueciSenha').textContent = "Usuário atualizado com sucesso!"
+      OpenCloseInputs('EnvEmail', 'open')
+      OpenCloseInputs('email', 'open')
+      OpenCloseInputs('codigo', 'close')
+      OpenCloseInputs('Nsenha', 'close')
+      OpenCloseInputs('UpPass', 'close')
+      setMsg('msgEsqueciSenha', 'Usuário atualizado com sucesso', 'sucesso')
     } catch (error) {
-      document.getElementById('msgEsqueciSenha').style.color = 'darkred'
-      document.getElementById('msgEsqueciSenha').textContent = "Não foi possível atualizar o usuário, por favor tente novamente"
+      setMsg('msgEsqueciSenha', 'Não foi possível atualizar a senha, por favor tente novamente', 'erro')
     } finally {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-
-  }, [])
 
   return (
     <div className='App'>
       {/* Botões de cadastro e Login */}
       <div className='botoes'>
         <button id="btnLogin" className='botoesPrincipais' onClick={telaLogin}>Fazer Login</button>
-        <button id="btnCadastro" className='botoesPrincipais' onClick={telaCadastro}>Criar Conta</button>
+        <button id="btnCadastro" className='botoesPrincipais' onClick={telaCadastro}>Não possui conta?</button>
       </div>
 
       {/* Tela Login */}
@@ -256,7 +244,7 @@ function Home() {
           <img className="logoImg" src={Logo} alt="" /> 
           <h1>KeysKeepSafe</h1>
         </div>
-        <h2>Cadastro</h2>
+        <h2>Faça seu Cadastro!</h2>
         <input name="name" type="text" placeholder='Nome' ref={CinputName} />
         <input name="Email" type="email" placeholder='Email' ref={CinputEmail} />
 

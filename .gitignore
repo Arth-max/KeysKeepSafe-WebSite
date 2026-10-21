@@ -11,7 +11,7 @@ node_modules
 
 # Arquivos sensíveis — back-end
 back-endUser/.env
-back-endUser/src/main/resources/application.properties
+back-endUser/firstProjectCadastro/src/main/resources/application.properties
 
 dist
 dist-ssr

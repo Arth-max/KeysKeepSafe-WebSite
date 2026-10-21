@@ -10,8 +10,7 @@ import Lixeira from '../../assets/Lixeira.png'
 import desverSenha from '../../assets/desverSenha.png'
 import verSenha from '../../assets/verSenha.png'
 import Logo from '../../assets/senha.png'
-import API from '../../hooks/user.js'
-import validarImagem from '../../hooks/user.js'
+import API, { validarImagem, setMsg, OpenCloseInputs, clearMsg, clearInputs } from '../../hooks/user.js'
 import { useState, useRef, useEffect } from 'react'
 import Footer from '../../components/Footer/Footer.jsx'
 
@@ -71,7 +70,7 @@ function Tela() {
     function mudarTema() {
         setChangeTheme(prev => !prev)
         setOpenConfig(false)
-        document.getElementById('msgImg').textContent = ''
+        clearMsg('msgImg')
     }
     //Abrir tela para editar o perfil
     function infoPerfil() {
@@ -82,7 +81,7 @@ function Tela() {
     }
     //Fechar tela para editar o perfil
     function fecharInfo() {
-        document.getElementById('msg').textContent = ''
+        clearMsg('msg')
         setOpenPerfil(false)
     }
     //Abrir tela de configurações
@@ -103,8 +102,8 @@ function Tela() {
     }
     //Função para voltar da tela de confirmar senha para tela principal
     function voltarSGSenhas() {
-        document.getElementById('Csenha').value = ''
-        document.getElementById('msgCS').textContent = ''
+        clearInputs('Csenha')
+        clearMsg('msgCS')
         setTela(false)
     }
     //Abrir tela do gerador de senha
@@ -121,8 +120,8 @@ function Tela() {
         setUseNumeros(false)
         setSenha('')
         setValor(8)
-        document.getElementById('Dsenha').value = ''
-        document.getElementById('msgGS').textContent = ''
+        clearInputs('Dsenha')
+        clearMsg('msgGS')
         setGerador(false)
     }
 
@@ -137,9 +136,9 @@ function Tela() {
     //Função para voltar da tela Senhas Salvas para tela principal
     function voltarSS() {
         setSenhasSalvas(false)
-        document.getElementById('Csenha').value = ''
-        document.getElementById('msgCS').style.display = 'flex'
-        document.getElementById('msgCS').textContent = ''
+        clearInputs('Csenha')
+        OpenCloseInputs('msgCS', 'open')
+        clearMsg('msgCS')
     }
 
     //Funções relacionadas a API\\
@@ -150,8 +149,7 @@ function Tela() {
         if (!img.trim()) { return; }
 
         if (!validarImagem(img)) {
-            document.getElementById('msgImg').style.color = 'darkred'
-            document.getElementById('msgImg').textContent = "URL inválida"
+            setMsg('msgImg', 'URL inválida', 'erro')
             return
         }
 
@@ -159,8 +157,7 @@ function Tela() {
         try {
             new URL(img)
         } catch (error) {
-            document.getElementById('msgImg').style.color = 'darkred'
-            document.getElementById('msgImg').textContent = "URL inválida"
+            setMsg('msgImg', 'URL inválida', 'erro')
             return
         }
         try {
@@ -171,11 +168,9 @@ function Tela() {
                 urlImg: img
             })
             setImg('')
-            document.getElementById('msgImg').style.color = 'seagreen'
-            document.getElementById('msgImg').textContent = "Imagem de fundo aplicada com sucesso"
+            setMsg('msgImg', 'Imagem de fundo aplicada com sucesso', 'sucesso')
         } catch (error) {
-            document.getElementById('msgImg').style.color = 'darkred'
-            document.getElementById('msgImg').textContent = "Erro ao aplicar imagem de fundo, por favor tente novamente"
+            setMsg('msgImg', 'Erro ao aplicar imagem de fundo, por favor tente novamente', 'erro')
         }
     }
 
@@ -185,11 +180,9 @@ function Tela() {
             await API.delete(`/usuario/image`)
             setBackgroundImg('')
             setImg('')
-            document.getElementById('msgImg').style.color = 'seagreen'
-            document.getElementById('msgImg').textContent = "Imagem de fundo removida com sucesso"
+            setMsg('msgImg', 'Imagem de fundo removida com sucesso', 'sucesso')
         } catch (error) {
-            document.getElementById('msgImg').style.color = 'darkred'
-            document.getElementById('msgImg').textContent = "Erro ao remover imagem de fundo, tente novamente"
+            setMsg('msgImg', 'Erro ao remover imagem de fundo, tente novamente', 'erro')
         }
     }
 
@@ -201,16 +194,14 @@ function Tela() {
             const novoEmail = email
 
             if (novoNome === usuario.nome && novoEmail === usuario.email) {
-                document.getElementById('msg').style.display = 'block'
-                document.getElementById('msg').style.color = 'darkred'
-                document.getElementById('msg').textContent = "Nenhuma alteração foi feita no seu perfil"
+                OpenCloseInputs('msg', 'open')
+                setMsg('msg', 'Nenhuma alteração foi feita no seu perfil', 'erro')
                 setLoading(false)
                 return
             }
             if (novoNome === '' || novoEmail === '') {
-                document.getElementById('msg').style.display = 'block'
-                document.getElementById('msg').style.color = 'darkred'
-                document.getElementById('msg').textContent = "Por favor preencha todos os campos"
+                OpenCloseInputs('msg', 'open')
+                setMsg('msg', 'Por favor preencha todos os campos', 'erro')
                 setLoading(false)
                 return
             }
@@ -225,18 +216,16 @@ function Tela() {
                 sessionStorage.setItem('token', response.data.token)
             }
 
-            document.getElementById('msg').style.display = 'block'
-            document.getElementById('msg').style.color = 'seagreen'
-            document.getElementById('msg').textContent = "Perfil atualizado com sucesso"
+            OpenCloseInputs('msg', 'open')
+            setMsg('msg', 'Perfil atualizado com sucesso', 'sucesso')
             setUsuario({
                 ...usuario,
                 nome: novoNome,
                 email: novoEmail
             })
         } catch (error) {
-            document.getElementById('msg').style.display = 'block'
-            document.getElementById('msg').style.color = 'darkred'
-            document.getElementById('msg').textContent = "Erro ao atualizar perfil, por favor tente novamente"
+            OpenCloseInputs('msg', 'open')
+            setMsg('msg', 'Erro ao atualizar perfil, por favor tente novamente', 'erro')
         } finally {
             setLoading(false)
         }
@@ -254,28 +243,28 @@ function Tela() {
                 alert("Usuário deletado com sucesso!")
                 navigate('/')
             } catch (error) {
-                document.getElementById('msg').style.color = 'darkred'
-                document.getElementById('msg').textContent = "Não foi possível deletar o usuário, tente novamente"
+                setMsg('msg', 'Erro ao deletar usuário, por favor tente novamente', 'erro')
             }
         }
     }
     
     //Função para confirmar a senha do usuário e Mostra-las na tela de Senhas Salvas(API)
     async function confirmSenha() {
+        setLoading(true)
         const senha = inputConfirmSenha.current.value
 
         if (senha === "") {
-            document.getElementById('msgCS').style.color = 'darkred'
-            document.getElementById('msgCS').textContent = "Por favor digite a sua senha do site"
+            setMsg('msgCS', 'Por favor digite a sua senha do site', 'erro')
+            setLoading(false)
             return
         }
 
+        setLoading(true)
         try {
             await API.post(`/usuario/confirmar-senha`, {
                 senha: senha
             })
-            document.getElementById('msgCS').style.color = 'seagreen'
-            document.getElementById('msgCS').textContent = "Usuario validado com sucesso"
+            setMsg('msgCS', 'Validado com sucesso', 'sucesso')
 
             const SenhaResponse = await API.get(`/usuario/buscar-senhas`)
             setSavePass(SenhaResponse.data)
@@ -283,19 +272,20 @@ function Tela() {
             setTela(false)
             setSenhasSalvas(true)
             if (SenhaResponse.data.length === 0) {
-                document.getElementById('msgSS').style.color = 'darkred'
-                document.getElementById('msgSS').textContent = "Você não possui nenhuma senha salva"
+                setMsg('msgSS', 'Você não possui nenhuma senha salva', 'erro')
                 return
             }
-            document.getElementById('msgSS').textContent = ''
+            clearMsg('msgCS')
         } catch (error) {
-            document.getElementById('msgCS').style.color = 'darkred'
-            document.getElementById('msgCS').textContent = "Senha incorreta"
+            setMsg('msgCS', 'Senha incorreta', 'erro')
+        } finally {
+            setLoading(false)
         }
     }
 
     //Função para gerar a senha(API)
     async function gerarSenha() {
+        setLoading(true)
         try {
             const response = await API.post(`/usuario/gerar-senha`, {
                 tamanho: valor,
@@ -307,29 +297,31 @@ function Tela() {
 
             setSenha(response.data)
 
-            document.getElementById('msgGS').style.color = 'seagreen'
-            document.getElementById('msgGS').textContent = "Senha gerada com sucesso!"
+            setMsg('msgGS', 'Senha gerada com sucesso!', 'sucesso')
         } catch (error) {
-            document.getElementById('msgGS').style.color = 'darkred'
-            document.getElementById('msgGS').textContent = "Erro ao gerar senha, por favor tente novamente"
+            setMsg('msgGS', 'Erro ao gerar senha, por favor tente novamente', 'erro')
+        } finally {
+            setLoading(false)
         }
     }
 
     //Função para salvar a senha(API)
     async function salvarSenha() {
+        setLoading(true)
         const descricao = inputDescricao.current.value
 
         if (descricao === "") {
-            document.getElementById('msgGS').style.color = 'darkred'
-            document.getElementById('msgGS').textContent = "Por favor digite uma descrição"
+            setMsg('msgGS', 'Por favor digite uma descrição', 'erro')
+            setLoading(false)
             return
         }
         if (senha === "") {
-            document.getElementById('msgGS').style.color = 'darkred'
-            document.getElementById('msgGS').textContent = "Por favor gere ou crie uma senha"
+            setMsg('msgGS', 'Por favor gere ou crie uma senha', 'erro')
+            setLoading(false)
             return
         }
 
+        setLoading(true)
         try {
             await API.post(`/usuario/salvar-senha`, {
                 senha: senha,
@@ -342,32 +334,35 @@ function Tela() {
             setUseNumeros(false)
             setSenha('')
             setValor(8)
-            document.getElementById('Dsenha').value = ''
-            document.getElementById('msgGS').style.color = 'seagreen'
-            document.getElementById('msgGS').textContent = "Senha salva com sucesso"
+            clearInputs('Dsenha')
+            setMsg('msgGS', 'Senha salva com sucesso', 'sucesso')
         } catch (error) {
-            document.getElementById('msgGS').style.color = 'darkred'
-            document.getElementById('msgGS').textContent = "Erro ao salvar senha, por favor tente novamente"
+            setMsg('msgGS', 'Erro ao salvar senha, por favor tente novamente', 'erro')
+        } finally {
+            setLoading(false)
         }
     }
 
     //Função para deletar a senha criada/gerada(API)
     async function deletarSenha(id) {
+        setLoading(true)
         const confirm = window.confirm("Deseja realmente deletar essa senha?")
 
-        if (!confirm) { return }
+        if (!confirm) { 
+            setLoading(false)
+            return 
+        }
 
+        setLoading(true)
         try {
             await API.delete(`/usuario/deletar-senha?id=${encodeURIComponent(id)}`)
             setSavePass(prev => {
                 const novasSenhas = prev.filter(item => item.id !== id)
 
                 if (novasSenhas.length === 0) {
-                    document.getElementById('msgSS').style.color = 'darkred'
-                    document.getElementById('msgSS').textContent = "Nenhuma senha salva"
+                    setMsg('msgSS', 'Você não possui nenhuma senha salva', 'erro')
                 } else {
-                    document.getElementById('msgSS').style.color = 'seagreen'
-                    document.getElementById('msgSS').textContent = "Senha deletada com sucesso"
+                    setMsg('msgSS', 'Senha deletada com sucesso', 'sucesso')
                 }
                 return novasSenhas
             })
@@ -375,13 +370,20 @@ function Tela() {
             setSenhaVisivel(null)
 
         } catch (error) {
-            document.getElementById('msgSS').style.color = 'darkred'
-            document.getElementById('msgSS').textContent = "Erro ao deletar senha, por favor tente novamente"
+            setMsg('msgSS', 'Erro ao deletar senha, por favor tente novamente', 'erro')
+        } finally {
+            setLoading(false)
         }
     } 
 
     //mantém os dados atualizados mesmo após sofrer efeitos por navegador
     useEffect(() => {
+        const token = sessionStorage.getItem('token')
+        if (!token) {
+            navigate('/')
+            return
+        }
+
         async function loadUser() {
             try {
                 const response = await API.get(`/usuario`)
@@ -454,85 +456,102 @@ function Tela() {
             {/* Telas advindas dos cards */}
             {/* ------------ */}
                 {/* Informações do Usuário */}
-                    <div id="informaçõesPerfil" className="informacoes" style={{ display: OpenPerfil ? 'flex' : 'none' }}>
-                        <h1>Suas informações</h1>
-                        <label htmlFor="nome">Nome</label>
-                        <input id="nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} />
-                        <label htmlFor="email">Email</label>
-                        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                {OpenPerfil && (
+                    <div className="overlay">
+                        <div id="informaçõesPerfil" className="informacoes" style={{ display: OpenPerfil ? 'flex' : 'none' }}>
+                            <h1>Suas informações</h1>
+                            <label htmlFor="nome">Nome</label>
+                            <input id="nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} />
+                            <label htmlFor="email">Email</label>
+                            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
-                        <div className="botoes">
-                            <button onClick={editarPerfil} disabled={loading}> {loading ? "Editando..." : "Editar"}</button>
-                            <button onClick={fecharInfo}> Fechar </button>
+                            <div className="botoes">
+                                <button onClick={editarPerfil} disabled={loading}> {loading ? "Editando..." : "Editar"}</button>
+                                <button onClick={fecharInfo}> Fechar </button>
+                            </div>
+                            <p id="msg" className="beforeCodigo"></p>
                         </div>
-                        <p id="msg" className="beforeCodigo"></p>
                     </div>
+                )}
 
                 {/* Tela Gerador de Senhas */}
-                    <div className="geradorSenha" style={{display: gerador ? 'flex' : 'none'}}>
-                        <h1>Gerador de Senhas</h1>
-                        <div className="opcoesSenha">
-                            <label htmlFor="myRange"> Tamanho da Senha: </label>
-                            <input id="myRange" type="range" min="8" max="20" value={valor} onChange={handleRange}/>
+                    {gerador && (
+                        <div className="overlay">
+                            <div className="geradorSenha" style={{display: gerador ? 'flex' : 'none'}}>
+                                <h1>Gerador de Senhas</h1>
+                                <div className="opcoesSenha">
+                                    <label htmlFor="myRange"> Tamanho da Senha: </label>
+                                    <input id="myRange" type="range" min="8" max="20" value={valor} onChange={handleRange}/>
 
-                            <label></label>
+                                    <label></label>
 
-                            <label> <span>{valor}</span> </label>
+                                    <label> <span>{valor}</span> </label>
 
-                            <label> <input type="checkbox" checked={useMaiusculas} onChange={(e) => {setUseMaiusculas(e.target.checked)}} value="letrasM" id="Maiusculas" />Maiúsculas </label>
-                            
-                            <label> <input type="checkbox" checked={useMinusculas} onChange={(e) => {setUseMinusculas(e.target.checked)}} value="letrasm" id="Minusculas" />Minúsculas</label>
-                            
-                            <label> <input type="checkbox" checked={useNumeros} onChange={(e) => {setUseNumeros(e.target.checked)}} value="numeros" id="numeros" />Números </label>
-                            
-                            <label> <input type="checkbox" checked={useEspeciais} onChange={(e) => {setUseEspeciais(e.target.checked)}} value="simbolos" id="simbolos" />Simbolos </label>
+                                    <label> <input type="checkbox" checked={useMaiusculas} onChange={(e) => {setUseMaiusculas(e.target.checked)}} value="letrasM" id="Maiusculas" />Maiúsculas </label>
+                                    
+                                    <label> <input type="checkbox" checked={useMinusculas} onChange={(e) => {setUseMinusculas(e.target.checked)}} value="letrasm" id="Minusculas" />Minúsculas</label>
+                                    
+                                    <label> <input type="checkbox" checked={useNumeros} onChange={(e) => {setUseNumeros(e.target.checked)}} value="numeros" id="numeros" />Números </label>
+                                    
+                                    <label> <input type="checkbox" checked={useEspeciais} onChange={(e) => {setUseEspeciais(e.target.checked)}} value="simbolos" id="simbolos" />Simbolos </label>
+                                </div>
+                                <input id="Dsenha" type="text" name="senha" placeholder="Descrição da sua senha" ref={inputDescricao}></input>
+                                <input id="Gsenha" type="text" name="senha" placeholder="Sua senha gerada/criada aqui" value={senha} onChange={(e) => setSenha(e.target.value)}></input>
+                                <div className="botoes">
+                                    <button className="imgButton" onClick={gerarSenha} disabled={loading}> {loading ? "Gerando..." : "Gerar Senha"} </button>
+                                    <button className="saveButton" onClick={salvarSenha}> Salvar Senha </button>
+                                    <button onClick={voltarGS}> Voltar </button>
+                                </div>
+                                <p id="msgGS"></p>
+                            </div>
                         </div>
-                        <input id="Dsenha" type="text" name="senha" placeholder="Descrição da sua senha" ref={inputDescricao}></input>
-                        <input id="Gsenha" type="text" name="senha" placeholder="Sua senha gerada/criada aqui" value={senha} onChange={(e) => setSenha(e.target.value)}></input>
-                        <div className="botoes">
-                            <button className="imgButton" onClick={gerarSenha}> Gerar Senha </button>
-                            <button className="saveButton" onClick={salvarSenha}> Salvar Senha </button>
-                            <button onClick={voltarGS}> Voltar </button>
-                        </div>
-                        <p id="msgGS"></p>
-                    </div>
+                    )}
+                    
 
                 {/* Tela para confirmar senha */}
-                    <div className="confirmSenha" style={{display: tela ? 'flex' : 'none'}}>
-                        <p>Digite a sua senha do site (Etapa de segurança)</p>
-                        <div className='senhas'>
-                            <input id="Csenha" type={VerSenha ? 'text' : 'password'} name="senha" placeholder="Sua senha" ref={inputConfirmSenha}></input>
-                            <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
+                {tela && (
+                    <div className="overlay">
+                        <div className="confirmSenha" style={{display: tela ? 'flex' : 'none'}}>
+                            <p>Digite a sua senha do site (Etapa de segurança)</p>
+                            <div className='senhas'>
+                                <input id="Csenha" type={VerSenha ? 'text' : 'password'} name="senha" placeholder="Sua senha" ref={inputConfirmSenha}></input>
+                                <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
+                            </div>
+                            <div className="botoes">
+                                <button className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
+                                <button onClick={voltarSGSenhas}> Voltar </button>
+                            </div>
+                            <p id="msgCS"></p>
                         </div>
-                        <div className="botoes">
-                            <button className="imgButton" onClick={confirmSenha}> Confirmar </button>
-                            <button onClick={voltarSGSenhas}> Voltar </button>
-                        </div>
-                        <p id="msgCS"></p>
                     </div>
+                )}
 
                 {/* Tela Senhas Salvas */}
-                    <div className="senhasSalvas" style={{display: senhasSalvas ? 'flex' : 'none'}}>
-                        <h1> Suas Senhas Salvas </h1>
-                        <div id="divSenhas">
-                            {pass.map((item) => (
-                                <div className="senhaSalva" key={item.id}>
-                                    <div className="campoSenha">
-                                        <label>{item.descricao}</label>
-                                    <input type={senhaVisivel === item.id ? 'text' : 'password'} value={item.senha} readOnly />
-                                    <button type="button" onClick={() => mostrarSenhas(item.id)}>
-                                        <img src={senhaVisivel === item.id ? desverSenha : verSenha}/>
-                                    </button>
-                                    <button type="button" onClick={() => deletarSenha(item.id)}>
-                                        <img src={Lixeira} alt="Deletar Senha"/>
-                                    </button>
+                {senhasSalvas && (
+                    <div className="overlay">
+                        <div className="senhasSalvas" style={{display: senhasSalvas ? 'flex' : 'none'}}>
+                            <h1> Suas Senhas Salvas </h1>
+                            <div id="divSenhas">
+                                {pass.map((item) => (
+                                    <div className="senhaSalva" key={item.id}>
+                                        <div className="campoSenha">
+                                            <label>{item.descricao}</label>
+                                        <input type={senhaVisivel === item.id ? 'text' : 'password'} value={item.senha} readOnly />
+                                        <button type="button" onClick={() => mostrarSenhas(item.id)}>
+                                            <img src={senhaVisivel === item.id ? desverSenha : verSenha}/>
+                                        </button>
+                                        <button type="button" onClick={() => deletarSenha(item.id)}>
+                                            <img src={Lixeira} alt="Deletar Senha"/>
+                                        </button>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
+                            <button onClick={voltarSS}> Voltar </button>
+                            <p id="msgSS"></p>
                         </div>
-                        <button onClick={voltarSS}> Voltar </button>
-                        <p id="msgSS"></p>
                     </div>
+                )}
 
                 <button className="logout" onClick={voltar}> Sair </button>
             </main>

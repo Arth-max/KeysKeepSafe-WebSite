@@ -5,6 +5,15 @@ const API = axios.create({
     baseURL: 'http://localhost:8081'
 })
 
+//Mensagens de sucesso ou erro
+export function setMsg(id, mensagem, tipo) {
+    const msg = document.getElementById(id)
+    if (!msg) return
+
+    msg.style.color = tipo === 'sucesso' ? 'seagreen' : 'darkred'
+    msg.textContent = mensagem
+}
+
 //Intercepta o token enviado pelo backend no login
 API.interceptors.request.use(
     (config) => {
@@ -47,12 +56,36 @@ export function validarImagem(url) {
         }
     }
 
-export function closeInputs() {
-    document.getElementById('codigo').style.display = 'none'
-    document.getElementById('Nsenha').style.display = 'none'
-    document.getElementById('UpPass').style.display = 'none'
-    document.getElementById('pass').style.display = 'none'
-    document.getElementById('msgEsqueciSenha').textContent = ""
+//Abre e fecha inputs
+export function OpenCloseInputs(id, tipo) {
+    const ID = document.getElementById(id)
+    if (!ID) return
+
+    ID.style.display = tipo === 'close' ? 'none' : 'block'
+}
+
+//Abre e fecha divs
+export function OpenCloseDiv(id, tipo) {
+    const ID = document.getElementById(id)
+    if (!ID) return
+
+    ID.style.display = tipo === 'close' ? 'none' : 'flex'
+}
+
+//Limpa mensagens
+export function clearMsg(id) {
+    const Cmsg = document.getElementById(id)
+    if (!Cmsg) return
+
+    Cmsg.textContent = ''
+}
+
+//Limpa inputs
+export function clearInputs(id) {
+    const Cinput = document.getElementById(id)
+    if (!Cinput) return
+
+    Cinput.value = ''
 }
 
 export default API

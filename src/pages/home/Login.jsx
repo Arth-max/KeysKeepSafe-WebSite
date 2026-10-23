@@ -5,7 +5,7 @@ import Logo from '../../assets/senha.png'
 import './Login.css'
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import API, { OpenCloseInputs, OpenCloseDiv, setMsg, clearMsg, clearInputs } from '../../hooks/user.js'
+import API, { validarSenha, OpenCloseInputs, OpenCloseDiv, setMsg, clearMsg, clearInputs } from '../../hooks/user.js'
 import Footer from '../../components/Footer/Footer.jsx'
 
 function Home() {
@@ -57,13 +57,6 @@ function Home() {
   //função para mostrar senha
   function mostrarSenha() {
     setMostrarSenha(!VerSenha)
-  }
-  //função para validar senha conforme regras
-  function validarSenha(senha) {
-    return (
-      /[0-9]/.test(senha) && /[A-Z]/.test(senha) && /[a-z]/.test(senha)
-      && /[!@#$%^&*()\-_=+[{\]}|;:'"<>.,/?~]/.test(senha)
-    )
   }
 
   //Funções relacionadas a API\\
@@ -226,6 +219,7 @@ function Home() {
           <img className="logoImg" src={Logo} alt="" /> 
           <h1>KeysKeepSafe</h1>
         </div>
+        <div className="divider"></div>
         <h2>Login</h2>
         <input name="name" type="text" placeholder='Nome' ref={inputName} />
 
@@ -244,6 +238,7 @@ function Home() {
           <img className="logoImg" src={Logo} alt="" /> 
           <h1>KeysKeepSafe</h1>
         </div>
+        <div className="divider"></div>
         <h2>Faça seu Cadastro!</h2>
         <input name="name" type="text" placeholder='Nome' ref={CinputName} />
         <input name="Email" type="email" placeholder='Email' ref={CinputEmail} />
@@ -262,6 +257,7 @@ function Home() {
           <img className="logoImg" src={Logo} alt="" /> 
           <h1>KeysKeepSafe</h1>
         </div>
+        <div className="divider"></div>
         <h2>Redefinir senha</h2>
         <input id='email' name="Email" type="email" placeholder='Digite seu Email' ref={Email} />
 

@@ -14,6 +14,14 @@ export function setMsg(id, mensagem, tipo) {
     msg.textContent = mensagem
 }
 
+//função para validar senha conforme regras
+export function validarSenha(senha) {
+    return (
+      /[0-9]/.test(senha) && /[A-Z]/.test(senha) && /[a-z]/.test(senha)
+      && /[!@#$%^&*()\-_=+[{\]}|;:'"<>.,/?~]/.test(senha)
+    )
+  }
+
 //Intercepta o token enviado pelo backend no login
 API.interceptors.request.use(
     (config) => {

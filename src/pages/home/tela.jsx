@@ -1,7 +1,6 @@
 //importações de imagens, arquivos e funções
 import './tela.css'
-import { useNavigate } from 'react-router-dom'
-import { useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import Config from '../../assets/Config.png'
 import Edit from '../../assets/Edit.png'
 import Sun from '../../assets/Sol.png'
@@ -368,7 +367,6 @@ function Tela() {
             })
 
             setSenhaVisivel(null)
-
         } catch (error) {
             setMsg('msgSS', 'Erro ao deletar senha, por favor tente novamente', 'erro')
         } finally {
@@ -413,7 +411,7 @@ function Tela() {
             {/* Configurações */}
             <div id="Config" className="configurations" style={{ display: OpenConfig ? 'flex' : 'none' }}>
                 <h2> Configurações </h2>
-                <button className="themeButton" onClick={changeColor}> <img src={Sol ? Sun : Moon}/> Mudar Tema </button>
+                <button className="themeButton" onClick={changeColor}> <img src={Sol ? Sun : Moon} alt=""/> Mudar Tema </button>
                 <button className="deleteButton" onClick={deleteUsers}> <img src={Lixeira} alt=""/> Deletar Conta </button>
             </div>
 
@@ -481,11 +479,13 @@ function Tela() {
                                 <h1>Gerador de Senhas</h1>
                                 <div className="opcoesSenha">
                                     <label htmlFor="myRange"> Tamanho da Senha: </label>
-                                    <input id="myRange" type="range" min="8" max="20" value={valor} onChange={handleRange}/>
+                                    <div className="range">
+                                        <input id="myRange" type="range" min="8" max="20" value={valor} onChange={handleRange}/>
+                                        <label> <span>{valor}</span> </label>
+                                    </div>
 
-                                    <label></label>
-
-                                    <label> <span>{valor}</span> </label>
+                                    <div className="divider"></div>
+                                    <div className="divider"></div>
 
                                     <label> <input type="checkbox" checked={useMaiusculas} onChange={(e) => {setUseMaiusculas(e.target.checked)}} value="letrasM" id="Maiusculas" />Maiúsculas </label>
                                     
@@ -538,10 +538,10 @@ function Tela() {
                                             <label>{item.descricao}</label>
                                         <input type={senhaVisivel === item.id ? 'text' : 'password'} value={item.senha} readOnly />
                                         <button type="button" onClick={() => mostrarSenhas(item.id)}>
-                                            <img src={senhaVisivel === item.id ? desverSenha : verSenha}/>
+                                            <img className="LCEImg" src={senhaVisivel === item.id ? desverSenha : verSenha} alt=""/>
                                         </button>
                                         <button type="button" onClick={() => deletarSenha(item.id)}>
-                                            <img src={Lixeira} alt="Deletar Senha"/>
+                                            <img className="LCEImg" src={Lixeira} alt="Deletar Senha"/>
                                         </button>
                                         </div>
                                     </div>

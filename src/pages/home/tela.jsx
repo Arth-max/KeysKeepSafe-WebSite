@@ -74,6 +74,7 @@ function Tela() {
     //Abrir tela para editar o perfil
     function infoPerfil() {
         setOpenPerfil(true)
+        setChangeTheme(false)
         setOpenConfig(false)
         setTela(false)
         setGerador(false)
@@ -98,6 +99,7 @@ function Tela() {
         setTela(prev => !prev)
         setGerador(false)
         setOpenConfig(false)
+        setChangeTheme(false)
     }
     //Função para voltar da tela de confirmar senha para tela principal
     function voltarSGSenhas() {
@@ -110,6 +112,7 @@ function Tela() {
         setGerador(prev => !prev)
         setOpenConfig(false)
         setOpenPerfil(false)
+        setChangeTheme(false)
     }
     //Função para voltar do gerador de senhas para tela principal
     function voltarGS() {
@@ -136,7 +139,6 @@ function Tela() {
     function voltarSS() {
         setSenhasSalvas(false)
         clearInputs('Csenha')
-        OpenCloseInputs('msgCS', 'open')
         clearMsg('msgCS')
     }
 
@@ -258,7 +260,6 @@ function Tela() {
             return
         }
 
-        setLoading(true)
         try {
             await API.post(`/usuario/confirmar-senha`, {
                 senha: senha
@@ -352,7 +353,6 @@ function Tela() {
             return 
         }
 
-        setLoading(true)
         try {
             await API.delete(`/usuario/deletar-senha?id=${encodeURIComponent(id)}`)
             setSavePass(prev => {
@@ -394,10 +394,10 @@ function Tela() {
         }
     }
         loadUser()
-    }, [])
+    }, [navigate])
 
     return (
-        <div id="main" className={temaClaro ? 'AppBlank' : 'App'} style={{ backgroundImage: backgroundImg ? `url("${backgroundImg}")` : 'none' }}>
+        <div id="main" className={temaClaro ? 'AppBlank' : 'App'} style={backgroundImg ? { backgroundImage: `url(${backgroundImg})` } : {}}>
             {/* Cabeçalho */}
             <header className="cabecalho">
                 <img className="cImg" src={Logo} alt="" /> 

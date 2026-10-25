@@ -1,3 +1,9 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 .App {
   display: flex;
   align-items: center;
@@ -5,9 +11,9 @@
   padding-top: 10px;
   min-height: 100vh;
   width: 100%;
-  box-sizing: border-box;
 
-  background-color: linear-gradient(135deg, #0a1f0a 0%, #0d2b1a 40%, #0a1a2e 100%);
+  background-color: #0d2b1a;
+  background-image: linear-gradient(135deg, #0a1f0a 0%, #0d2b1a 40%, #0a1a2e 100%);
   color: white;
   background-size: cover;
   background-position: center;
@@ -38,7 +44,6 @@
   padding-top: 10px;
   min-height: 100vh;
   width: 100%;
-  box-sizing: border-box;
 
   color: #222;
   background: rgba(255, 255, 255, 0.7);
@@ -125,9 +130,8 @@
   align-items: center;
   gap: 10px;
   width: 450px;
-  max-width: calc(100% - 40%);
+  max-width: 60%;
   padding: 8px;
-  box-sizing: border-box;
   margin-top: 10px;
   border-radius: 15px;
 }
@@ -163,12 +167,11 @@
   min-height: 210px;
   padding: 25px;
   gap: 12px;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  border: 1px solid #0d2b1a;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 18px;
-  background: linear-gradient(to bottom right, rgba(46, 139, 87, 0.5), rgba(20, 20, 20, 0.2), rgba(30, 144, 255, 0.5));
+  background: linear-gradient(135deg, rgba(0, 100, 0, 0.5), #0d2b1a, rgba(46, 139, 87, 0.2));
   backdrop-filter: blur(10px);
   transition: transform 0.3s ease,
               background 0.3s ease,
@@ -209,22 +212,18 @@
 }
 
 .geradorSenha {
-  left: 50%;
-  top: 50%;
   padding: 30px;
   gap: 15px;
   width: 100%;
   max-width: 650px;
   margin: 0 auto;
-  box-sizing: border-box;
-  display: none;
+  display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 18px;
   background: rgba(20, 20, 20, 0.5);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
 }
 .geradorSenha input {
   background: rgba(128, 128, 128, 0.5);
@@ -258,22 +257,18 @@
 }
 
 .senhasSalvas {
-  left: 50%;
-  top: 50%;
   padding: 30px;
   gap: 15px;
   width: 100%;
   max-width: 650px;
   margin: 0 auto;
-  box-sizing: border-box;
-  display: none;
+  display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 18px;
   background: rgba(20, 20, 20, 0.5);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
 }
 .senhasSalvas input {
   background: rgba(47, 79, 79, 0.4);
@@ -290,7 +285,6 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  box-sizing: border-box;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -351,7 +345,6 @@ input[type=range]::-webkit-slider-runnable-track {
   width: 100%;
   height: 45px;
   padding: 0 15px;
-  box-sizing: border-box;
   border-radius: 10px;
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -398,22 +391,18 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 
 .confirmSenha {
-  left: 50%;
-  top: 45%;
   padding: 25px;
   gap: 15px;
   width: 90%;
   max-width: 500px;
   margin: 0 auto;
-  box-sizing: border-box;
-  display: none;
+  display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 18px;
   background: rgba(20, 20, 20, 0.5);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
 }
 
 .confirmSenha .botoes button {
@@ -421,27 +410,22 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 
 .informacoes {
-  left: 50%;
-  top: 50%;
   padding: 30px;
   gap: 15px;
   width: 70%;
   max-width: 500px;
   margin: 0 auto;
-  box-sizing: border-box;
-  display: none;
+  display: flex;
   flex-direction: column;
   align-items: center;
   border-radius: 18px;
   background: rgba(20, 20, 20, 0.5);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  transform: translate(-50%, -50%);
 }
 .informacoes input {
     border-radius: 10px;
     height: 45px;
-    box-sizing: border-box;
     padding: 0 5px;
     gap: 20px;
     width: 90%;
@@ -498,7 +482,6 @@ input[type=range]::-webkit-slider-runnable-track {
   right: max(4%, calc((100% - 1100px) /2));
   width: 280px;
   padding: 22px;
-  box-sizing: border-box;
   gap: 12px;
   display: none;
   flex-direction: column;
@@ -511,7 +494,7 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 .configurations h2 {
   color: white;
-  margin-top: 0 0 10px;
+  margin-top: 0 10px;
   font-size: 20px;
   text-align: center;
 }
@@ -526,7 +509,6 @@ input[type=range]::-webkit-slider-runnable-track {
 .configurations input {
   border-radius: 10px;
   height: 35px;
-  box-sizing: border-box;
   padding: 0 5px;
   width: 100%;
   background: rgba(255, 255, 255, 0.05);
@@ -649,7 +631,6 @@ input[type=range]::-webkit-slider-runnable-track {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-sizing: border-box;
   padding: 10px 20px;
   border-radius: 15px;
   background: linear-gradient(to bottom right, rgba(30, 144, 255, 0.4), rgba(46, 139, 87, 0.4));
@@ -727,5 +708,18 @@ img {
   }
   .geradorSenha .botoes {
     max-width: 90%;
+  }
+  .cabecalho {
+    gap: 10px;
+    h1 {
+      font-size: 20px;
+    }
+    img {
+      width: 28px;
+      height: 28px;
+    }
+    .botoes {
+      width: 350px;
+    }
   }
 }

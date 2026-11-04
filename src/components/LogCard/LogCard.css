@@ -30,7 +30,7 @@
     border-radius: 12px;
     background: color-mix(in srgb, var(--tom) 15%, transparent);
     border: 1px solid color-mix(in srgb, var(--tom) 40%, transparent);
-    transition: background 0.2 ease; 
+    transition: background 0.2s ease; 
 }
 
 .log-icon img { width: 24px; height: 24px; object-fit: contain; }

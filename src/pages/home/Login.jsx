@@ -28,6 +28,13 @@ function Home() {
   const NinputSenha = useRef()
   const Email = useRef()
 
+ //Introdução da tecla Enter
+  function handleKeyPress(acao) {
+    return (e) => {
+      e.preventDefault()
+      if (!loading) acao()
+    }
+  }
   //Funções relacionadas aos estados da tela\\
   //ativar tela login
   function telaLogin() {
@@ -99,7 +106,6 @@ function Home() {
 
   //função criar usuários pela API
   async function createUsers() {
-    setLoading(true)
     if (CinputName.current.value === "" || CinputEmail.current.value === "" || CinputSenha.current.value === "") {
       setMsg('msgCadastro', 'Por favor digite todos os campos', 'erro')
       setLoading(false)
@@ -146,7 +152,7 @@ function Home() {
     }
     setLoading(true)
     try {
-        await API.post('/usuario/recuperar-senha?email=' + email)
+        await API.post('/usuario/recuperar-senha?email', null, {params: {email}})
         OpenCloseInputs('EnvEmail', 'close')
         OpenCloseInputs('email', 'close')
         OpenCloseInputs('codigo', 'open')
@@ -156,7 +162,7 @@ function Home() {
 
         setMsg('msgEsqueciSenha', 'Um código foi enviado para o seu email', 'sucesso')
     } catch (error) {
-        setMsg('msgCadastro', 'email não cadastrado ou inválido', 'erro')
+        setMsg('msgEsqueciSenha', 'email não cadastrado ou inválido', 'erro')
     } finally {
         setLoading(false)
     }
@@ -170,7 +176,7 @@ function Home() {
     setLoading(true)
 
     if (cod === '') {
-      setMsg('msgEsqueciSenha', 'Usuário não cadastrado, por favor digite o codigo', 'erro')
+      setMsg('msgEsqueciSenha', 'Por favor digite o código enviado pelo email', 'erro')
       setLoading(false)
       return
     }
@@ -186,7 +192,7 @@ function Home() {
     }
     setLoading(true)
     try {
-      await API.put(`/usuario/atualizarSenha?email=${email}&cod=${cod}`, { senha: Nsenha })
+      await API.put('/usuario/atualizarSenha', { senha: Nsenha }, {params: {email, cod}})
 
       Email.current.value = ''
       codigo.current.value = ''
@@ -214,40 +220,42 @@ function Home() {
       </div>
 
       {/* Tela Login */}
-      <form className='login' style={{ display: tela === 'login' ? 'flex' : 'none' }}>
+      <form className='login' style={{ display: tela === 'login' ? 'flex' : 'none' }} onSubmit={handleKeyPress(findUsers)}>
         <div className='title'>
           <img className="logoImg" src={Logo} alt="" /> 
           <h1>KeysKeepSafe</h1>
         </div>
         <div className="divider"></div>
         <h2>Login</h2>
-        <input name="name" type="text" placeholder='Nome' ref={inputName} />
+        <input name="name" autoComplete="username" type="text" placeholder='Nome' ref={inputName} />
 
         <div className='senhas'>
-          <input name="senha" type={VerSenha ? 'text' : 'password'} placeholder='Senha' ref={inputSenha} />
-          <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
+          <input name="senha" autoComplete="current-password" type={VerSenha ? 'text' : 'password'} placeholder='Senha' ref={inputSenha} />
+          <button type="button" className='divSenhas' onClick={mostrarSenha} aria-label={VerSenha ? 'Ocultar senha' : 'Mostrar senha'}>
+            <img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" />
+          </button>
         </div>
         <a onClick={forgotPassword} className='a-forgotPass' role="button">Esqueci minha senha</a>
-        <button type="button" className='btn-login' onClick={findUsers} disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
+        <button type="submit" className='btn-login' onClick={findUsers} disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
         <p id="msgLogin"></p>
       </form>
 
       {/* Tela Cadastro */}
-      <form className='cadastro' style={{ display: tela === 'cadastro' ? 'flex' : 'none' }}>
+      <form className='cadastro' style={{ display: tela === 'cadastro' ? 'flex' : 'none' }} onSubmit={handleKeyPress(createUsers)}>
         <div className='title'>
           <img className="logoImg" src={Logo} alt="" /> 
           <h1>KeysKeepSafe</h1>
         </div>
         <div className="divider"></div>
         <h2>Faça seu Cadastro!</h2>
-        <input name="name" type="text" placeholder='Nome' ref={CinputName} />
-        <input name="Email" type="email" placeholder='Email' ref={CinputEmail} />
+        <input name="name" autoComplete="username" type="text" placeholder='Nome' ref={CinputName} />
+        <input name="Email" autoComplete="Email" type="email" placeholder='Email' ref={CinputEmail} />
 
         <div className='senhas'>
-          <input name="senha" type={VerSenha ? 'text' : 'password'} placeholder='Senha' ref={CinputSenha} />
+          <input name="senha" autoComplete="new-password" type={VerSenha ? 'text' : 'password'} placeholder='Senha' ref={CinputSenha} />
           <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
         </div>
-        <button className="btn-cadastro" type="button" onClick={createUsers} disabled={loading}>{loading ? 'Cadastrando...' : 'Cadastrar'}</button>
+        <button className="btn-cadastro" type="submit" onClick={createUsers} disabled={loading}>{loading ? 'Cadastrando...' : 'Cadastrar'}</button>
         <p id="msgCadastro"></p>
       </form>
 
@@ -259,13 +267,13 @@ function Home() {
         </div>
         <div className="divider"></div>
         <h2>Redefinir senha</h2>
-        <input id='email' name="Email" type="email" placeholder='Digite seu Email' ref={Email} />
+        <input id='email' autoComplete="current-email" name="Email" type="email" placeholder='Digite seu Email' ref={Email} />
 
-        <input id='codigo' className='beforeCodigo' type="number" placeholder='Digite o código enviado pelo email' ref={codigo} />
+        <input id='codigo' autoComplete="cod-email" className='beforeCodigo' type="number" placeholder='Digite o código enviado pelo email' ref={codigo} />
         
         {/* Div para criar nova senha */}
         <div id="pass" className='senhasBC'>
-          <input id='Nsenha' className='beforeCodigo' type={VerSenha ? 'text' : 'password'} placeholder='Digite sua nova senha' ref={NinputSenha} />
+          <input id='Nsenha' autoComplete="new-password" className='beforeCodigo' type={VerSenha ? 'text' : 'password'} placeholder='Digite sua nova senha' ref={NinputSenha} />
           <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
         </div>
 

@@ -1,16 +1,21 @@
+//importações de arquivos e funções
 import "../LogCard/LogCard.css";
 import { ACOES, ACAO_PADRAO } from "../../hooks/logConfig";
 
+//Função que formata a ação do log
 function formatarAcao(acao) {
     const text = (acao ?? "Ação").replaceAll("_", " ").toLowerCase();
     return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+//Função principal do componente(Retorna o LogCard)
 function LogCard({ log }) {
     const cfg = ACOES[log.acao] ?? ACAO_PADRAO;
     const data = log.horario ? new Date(log.horario) : null
-    const hora = data && !isNaN(data) ? data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Horário desconhecido";
+    const hora = data && !Number.isNaN(data) ? data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Horário desconhecido";
 
     return (
+        /* Componente LogCard */
         <article className={`log-card tom-${cfg.tom}`}>
             <div className="log-icon" aria-hidden="true">
                 {cfg.icone && <img src={cfg.icone} alt="" />}

@@ -394,7 +394,7 @@ function Tela() {
             console.error("Erro ao carregar o usuário: ", error)
         }
     }
-        loadUser()
+        void loadUser()
     }, [navigate])
 
     return (
@@ -413,7 +413,7 @@ function Tela() {
             <div id="Config" className="configurations" style={{ display: OpenConfig ? 'flex' : 'none' }}>
                 <h2> Configurações </h2>
                 <button className="themeButton" onClick={changeColor}> <img src={Sol ? Sun : Moon} alt=""/> Mudar Tema </button>
-                <button className="logButton" onClick={() => navigate('/historico')}> <img src={Relogio} alt=""/> Logs </button>
+                <button className="logButton" onClick={() => navigate('/historico')}> <img src={Relogio} alt=""/> Suas Atividades </button>
                 <button className="deleteButton" onClick={deleteUsers}> <img src={Lixeira} alt=""/> Deletar Conta </button>
             </div>
 

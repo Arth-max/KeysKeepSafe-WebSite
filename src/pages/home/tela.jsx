@@ -9,6 +9,7 @@ import Lixeira from '../../assets/Lixeira.png'
 import desverSenha from '../../assets/desverSenha.png'
 import verSenha from '../../assets/verSenha.png'
 import Logo from '../../assets/senha.png'
+import Relogio from '../../assets/relogio.png'
 import API, { validarImagem, setMsg, OpenCloseInputs, clearMsg, clearInputs } from '../../hooks/user.js'
 import { useState, useRef, useEffect } from 'react'
 import Footer from '../../components/Footer/Footer.jsx'
@@ -39,6 +40,7 @@ function Tela() {
     const [senha, setSenha] = useState('')
     const [pass, setSavePass] = useState([])
     const [senhaVisivel, setSenhaVisivel] = useState(null)
+    const [logs, setLogs] = useState([])
 
     //Estados dos inputs
     const inputConfirmSenha = useRef()
@@ -146,7 +148,6 @@ function Tela() {
     //Função para mudar a imagem de fundo(API)
     async function changeImg() {
         const imageUrl = encodeURIComponent(img)
-
         if (!img.trim()) { return; }
 
         if (!validarImagem(img)) {
@@ -412,6 +413,7 @@ function Tela() {
             <div id="Config" className="configurations" style={{ display: OpenConfig ? 'flex' : 'none' }}>
                 <h2> Configurações </h2>
                 <button className="themeButton" onClick={changeColor}> <img src={Sol ? Sun : Moon} alt=""/> Mudar Tema </button>
+                <button className="logButton" onClick={() => navigate('/historico')}> <img src={Relogio} alt=""/> Logs </button>
                 <button className="deleteButton" onClick={deleteUsers}> <img src={Lixeira} alt=""/> Deletar Conta </button>
             </div>
 
@@ -453,59 +455,59 @@ function Tela() {
 
             {/* Telas advindas dos cards */}
             {/* ------------ */}
-                {/* Informações do Usuário */}
-                {OpenPerfil && (
-                    <div className="overlay">
-                        <div id="informaçõesPerfil" className="informacoes" style={{ display: OpenPerfil ? 'flex' : 'none' }}>
-                            <h1>Suas informações</h1>
-                            <label htmlFor="nome">Nome</label>
-                            <input id="nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} />
-                            <label htmlFor="email">Email</label>
-                            <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            {/* Informações do Usuário */}
+            {OpenPerfil && (
+                <div className="overlay">
+                    <div id="informaçõesPerfil" className="informacoes" style={{ display: OpenPerfil ? 'flex' : 'none' }}>
+                        <h1>Suas informações</h1>
+                        <label htmlFor="nome">Nome</label>
+                        <input id="nome" type="text" value={nome} onChange={(e) => setNome(e.target.value)} />
+                        <label htmlFor="email">Email</label>
+                        <input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
 
-                            <div className="botoes">
-                                <button onClick={editarPerfil} disabled={loading}> {loading ? "Editando..." : "Editar"}</button>
-                                <button onClick={fecharInfo}> Fechar </button>
+                        <div className="botoes">
+                            <button onClick={editarPerfil} disabled={loading}> {loading ? "Editando..." : "Editar"}</button>
+                            <button onClick={fecharInfo}> Fechar </button>
+                        </div>
+                        <p id="msg" className="beforeCodigo"></p>
+                        </div>
+                </div>
+            )}
+
+            {/* Tela Gerador de Senhas */}
+            {gerador && (
+                <div className="overlay">
+                    <div className="geradorSenha" style={{display: gerador ? 'flex' : 'none'}}>
+                        <h1>Gerador de Senhas</h1>
+                        <div className="opcoesSenha">
+                            <label htmlFor="myRange"> Tamanho da Senha: </label>
+                            <div className="range">
+                                <input id="myRange" type="range" min="8" max="20" value={valor} onChange={handleRange}/>
+                                <label> <span>{valor}</span> </label>
                             </div>
-                            <p id="msg" className="beforeCodigo"></p>
+
+                                <div className="divider"></div>
+                                <div className="divider"></div>
+
+                                <label> <input type="checkbox" checked={useMaiusculas} onChange={(e) => {setUseMaiusculas(e.target.checked)}} value="letrasM" id="Maiusculas" />Maiúsculas </label>
+                                    
+                                <label> <input type="checkbox" checked={useMinusculas} onChange={(e) => {setUseMinusculas(e.target.checked)}} value="letrasm" id="Minusculas" />Minúsculas</label>
+                                    
+                                <label> <input type="checkbox" checked={useNumeros} onChange={(e) => {setUseNumeros(e.target.checked)}} value="numeros" id="numeros" />Números </label>
+                                    
+                                <label> <input type="checkbox" checked={useEspeciais} onChange={(e) => {setUseEspeciais(e.target.checked)}} value="simbolos" id="simbolos" />Simbolos </label>
+                            </div>
+                            <input id="Dsenha" type="text" name="senha" placeholder="Descrição da sua senha" ref={inputDescricao}></input>
+                            <input id="Gsenha" type="text" name="senha" placeholder="Sua senha gerada/criada aqui" value={senha} onChange={(e) => setSenha(e.target.value)}></input>
+                            <div className="botoes">
+                                <button className="imgButton" onClick={gerarSenha} disabled={loading}> {loading ? "Gerando..." : "Gerar Senha"} </button>
+                                <button className="saveButton" onClick={salvarSenha}> Salvar Senha </button>
+                                <button onClick={voltarGS}> Voltar </button>
+                            </div>
+                            <p id="msgGS"></p>
                         </div>
                     </div>
                 )}
-
-                {/* Tela Gerador de Senhas */}
-                    {gerador && (
-                        <div className="overlay">
-                            <div className="geradorSenha" style={{display: gerador ? 'flex' : 'none'}}>
-                                <h1>Gerador de Senhas</h1>
-                                <div className="opcoesSenha">
-                                    <label htmlFor="myRange"> Tamanho da Senha: </label>
-                                    <div className="range">
-                                        <input id="myRange" type="range" min="8" max="20" value={valor} onChange={handleRange}/>
-                                        <label> <span>{valor}</span> </label>
-                                    </div>
-
-                                    <div className="divider"></div>
-                                    <div className="divider"></div>
-
-                                    <label> <input type="checkbox" checked={useMaiusculas} onChange={(e) => {setUseMaiusculas(e.target.checked)}} value="letrasM" id="Maiusculas" />Maiúsculas </label>
-                                    
-                                    <label> <input type="checkbox" checked={useMinusculas} onChange={(e) => {setUseMinusculas(e.target.checked)}} value="letrasm" id="Minusculas" />Minúsculas</label>
-                                    
-                                    <label> <input type="checkbox" checked={useNumeros} onChange={(e) => {setUseNumeros(e.target.checked)}} value="numeros" id="numeros" />Números </label>
-                                    
-                                    <label> <input type="checkbox" checked={useEspeciais} onChange={(e) => {setUseEspeciais(e.target.checked)}} value="simbolos" id="simbolos" />Simbolos </label>
-                                </div>
-                                <input id="Dsenha" type="text" name="senha" placeholder="Descrição da sua senha" ref={inputDescricao}></input>
-                                <input id="Gsenha" type="text" name="senha" placeholder="Sua senha gerada/criada aqui" value={senha} onChange={(e) => setSenha(e.target.value)}></input>
-                                <div className="botoes">
-                                    <button className="imgButton" onClick={gerarSenha} disabled={loading}> {loading ? "Gerando..." : "Gerar Senha"} </button>
-                                    <button className="saveButton" onClick={salvarSenha}> Salvar Senha </button>
-                                    <button onClick={voltarGS}> Voltar </button>
-                                </div>
-                                <p id="msgGS"></p>
-                            </div>
-                        </div>
-                    )}
                     
 
                 {/* Tela para confirmar senha */}

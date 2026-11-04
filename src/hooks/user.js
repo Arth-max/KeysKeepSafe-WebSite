@@ -5,23 +5,6 @@ const API = axios.create({
     baseURL: 'http://localhost:8081'
 })
 
-//Mensagens de sucesso ou erro
-export function setMsg(id, mensagem, tipo) {
-    const msg = document.getElementById(id)
-    if (!msg) return
-
-    msg.style.color = tipo === 'sucesso' ? 'seagreen' : 'darkred'
-    msg.textContent = mensagem
-}
-
-//função para validar senha conforme regras
-export function validarSenha(senha) {
-    return (
-      /[0-9]/.test(senha) && /[A-Z]/.test(senha) && /[a-z]/.test(senha)
-      && /[!@#$%^&*()\-_=+[{\]}|;:'"<>.,/?~]/.test(senha)
-    )
-  }
-
 //Intercepta o token enviado pelo backend no login
 API.interceptors.request.use(
     (config) => {
@@ -38,18 +21,27 @@ API.interceptors.request.use(
 )
 
 //verifica se o token expirou
-API.interceptors.request.use(
+API.interceptors.response.use(
     (response) => {
         return response
     },
     (error) => {
         if (error.response?.status === 401) {
             sessionStorage.removeItem('token')
+            if (window.location.pathname == '/') {
+                return
+            }
             window.location.href = '/'
         }
         return Promise.reject(error)
     }
 )
+
+//Função para buscar logs
+export async function buscarLogs() {
+    const response = await API.get('/usuario/logs');
+    return response.data;
+}
 
 //Restringe urls para apenas requisições http e https
 export function validarImagem(url) {
@@ -60,7 +52,7 @@ export function validarImagem(url) {
                 parseUrl.protocol === 'http:' || parseUrl.protocol === 'https:' 
             )
         } catch (error) {
-            return "URL inválida " + error
+            return false
         }
     }
 
@@ -71,6 +63,23 @@ export function OpenCloseInputs(id, tipo) {
 
     ID.style.display = tipo === 'close' ? 'none' : 'block'
 }
+
+//Mensagens de sucesso ou erro
+export function setMsg(id, mensagem, tipo) {
+    const msg = document.getElementById(id)
+    if (!msg) return
+
+    msg.style.color = tipo === 'sucesso' ? 'seagreen' : 'darkred'
+    msg.textContent = mensagem
+}
+
+//função para validar senha conforme regras
+export function validarSenha(senha) {
+    return (
+      /[0-9]/.test(senha) && /[A-Z]/.test(senha) && /[a-z]/.test(senha)
+      && /[!@#$%^&*()\-_=+[{\]}|;:'"<>.,/?~]/.test(senha)
+    )
+  }
 
 //Abre e fecha divs
 export function OpenCloseDiv(id, tipo) {

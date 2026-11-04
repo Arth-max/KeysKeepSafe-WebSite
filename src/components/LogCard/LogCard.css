@@ -1,0 +1,58 @@
+.log-card {
+    --tom: #94A3B8;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, rgba(37, 55, 43, 0.75), rgba(28, 39, 43, 0.75), var(--tom) 125%);
+    border: 1px solid var(--borda, #353541);
+    border-left: 3px solid var(--tom);
+    border-radius: 12px;
+    transition: background 0.2s, transform 0.2s ease, border-color 0.2s ease;
+}
+
+.log-card:hover { background: rgba(46, 139, 87, 0.3); transform: translateY(-4px); }
+
+.tom-azul     { --tom: #60A5FA; }
+.tom-verde    { --tom: #4ADE80; }
+.tom-vermelho { --tom: #F87171; }
+.tom-amarelo  { --tom: #F0E68C; }
+.tom-marrom   { --tom: #8B4513; }
+
+.log-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--tom) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--tom) 40%, transparent);
+    transition: background 0.2 ease; 
+}
+
+.log-icon img { width: 24px; height: 24px; object-fit: contain; }
+
+.log-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+
+.log-info h3 { margin: 0; font-size: 16px; font-weight: 700; color: #F4F4F5; }
+
+.log-info p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #A1A1AA;
+    overflow-wrap: anywhere;
+}
+
+.log-time { align-self: flex-start; font-size: 12px; color: #A1A1AA; white-space: nowrap; }
+
+@media (max-width: 500px) {
+    .log-card { gap: 12px; padding: 12px; }
+    .log-icon { flex-basis: 38px; height: 38px; }
+    .log-icon img { width: 20px; height: 20px; }
+    .log-info h3 { font-size: 14px; }
+    .log-info p { font-size: 12px; }
+}

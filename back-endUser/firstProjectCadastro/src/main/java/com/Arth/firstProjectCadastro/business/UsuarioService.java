@@ -3,90 +3,34 @@ package com.Arth.firstProjectCadastro.business;
 import com.Arth.firstProjectCadastro.infrastructure.DTOs.SenhasResponseDTO;
 import com.Arth.firstProjectCadastro.infrastructure.entitys.User;
 import com.Arth.firstProjectCadastro.infrastructure.entitys.SenhasSalvas;
-import com.Arth.firstProjectCadastro.infrastructure.repository.SenhasRepository;
-import com.Arth.firstProjectCadastro.infrastructure.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Value;
+import com.Arth.firstProjectCadastro.infrastructure.repositorys.SenhasRepository;
+import com.Arth.firstProjectCadastro.infrastructure.repositorys.UsuarioRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class UsuarioService {
     private final UsuarioRepository repository;
     private final EmailService EmailService;
+    private final SenhasService SenhasService;
+    private final LogService logService;
     private final SenhasRepository senhasRepository;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final SecureRandom random = new SecureRandom();
 
-    private static final String Transform = "AES/GCM/NoPadding";
-    private static final int TAG_LENGTH_BIT = 128;
-    private static final int IV_LENGTH_BYTE = 12;
-    private final SecretKey secretKey;
-
     public UsuarioService(UsuarioRepository repository, EmailService EmailService,
-                          SenhasRepository senhasRepository, @Value("${app.fixed_Key}") String key) {
+                          SenhasRepository senhasRepository, SenhasService SenhasService, LogService logService) {
         this.EmailService = EmailService;
         this.repository = repository;
         this.senhasRepository = senhasRepository;
-
-        byte[] keyBytes = Base64.getDecoder().decode(key);
-        if (keyBytes.length != 32) {
-            throw new IllegalArgumentException("A chave deve possuir 32 bits");
-        }
-        this.secretKey = new SecretKeySpec(keyBytes, "AES");
-    }
-
-    public String encrypt(String encryptText) throws Exception {
-        byte[] iv = new byte[IV_LENGTH_BYTE];
-        random.nextBytes(iv);
-
-        Cipher cipher = Cipher.getInstance(Transform);
-        GCMParameterSpec parameterSpec = new GCMParameterSpec(TAG_LENGTH_BIT, iv);
-
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, parameterSpec);
-        byte[] cipherText = cipher.doFinal(encryptText.getBytes(StandardCharsets.UTF_8));
-
-        ByteBuffer byteBuffer = ByteBuffer.allocate(iv.length + cipherText.length);
-        byteBuffer.put(iv);
-        byteBuffer.put(cipherText);
-
-        return Base64.getEncoder().encodeToString(byteBuffer.array());
-    }
-
-    public String decrypt(String strToDecrypt) throws Exception {
-        byte[] decodedBytes = Base64.getDecoder().decode(strToDecrypt);
-
-        if (decodedBytes.length <= IV_LENGTH_BYTE) {
-            throw new IllegalArgumentException("Criptografia inválida");
-        }
-
-        ByteBuffer byteBuffer = ByteBuffer.wrap(decodedBytes);
-        byte[] iv = new byte[IV_LENGTH_BYTE];
-        byteBuffer.get(iv);
-
-        byte[] cipherText = new byte[byteBuffer.remaining()];
-        byteBuffer.get(cipherText);
-
-        Cipher cipher = Cipher.getInstance(Transform);
-        GCMParameterSpec parameterSpec = new GCMParameterSpec(TAG_LENGTH_BIT, iv);
-
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, parameterSpec);
-        byte[] pText = cipher.doFinal(cipherText);
-
-        return new String(pText, StandardCharsets.UTF_8);
+        this.SenhasService = SenhasService;
+        this.logService = logService;
     }
 
     public void salvarUsuario(User usuario) {
@@ -103,8 +47,10 @@ public class UsuarioService {
                 () -> new RuntimeException("Usuario não encontrado"));
 
         if (!encoder.matches(senha, usuario.getSenha())) {
+            logService.register(usuario, "LOGIN_BAD", "Tentativa de login mal-sucedida");
             throw new RuntimeException("Senha incorreta");
         }
+        logService.register(usuario, "LOGIN", "Login bem-sucedido");
         return usuario;
     }
 
@@ -114,6 +60,8 @@ public class UsuarioService {
         );
         usuario.setUrlImg(image);
         repository.saveAndFlush(usuario);
+        logService.register(usuario, "IMAGEM_ADICIONADA",
+                "Uma imagem foi adicionado ao fundo do site de sua conta");
     }
 
     public void deletarImagem(String nome) {
@@ -122,6 +70,8 @@ public class UsuarioService {
         );
         usuario.setUrlImg(null);
         repository.saveAndFlush(usuario);
+        logService.register(usuario, "IMAGEM_DELETADA",
+                "Uma imagem de fundo da sua conta foi deletada");
     }
 
     public void recuperarSenhaEmail(String email) {
@@ -159,6 +109,7 @@ public class UsuarioService {
             usuarioEntity.setCodigoRecuperacao(null);
             usuarioEntity.setCodExpiracao(null);
             repository.saveAndFlush(usuarioEntity);
+            logService.register(usuarioEntity, "SENHA_ATUALIZADA", "Sua senha do site foi atualizada");
     }
 
     public void confirmSenha(String email, String senha) {
@@ -238,13 +189,15 @@ public class UsuarioService {
         }
 
         try {
-            String senhaCripto = encrypt(Ssenha);
+            String senhaCripto = SenhasService.encrypt(Ssenha);
             SenhasSalvas salvarSenha = SenhasSalvas.builder()
                     .Descricao(descricao).SenhaCrypto(senhaCripto)
                     .dataCriacao(LocalDateTime.now()).usuario(usuarioEntity)
                     .build();
 
             senhasRepository.save(salvarSenha);
+            logService.register(usuarioEntity,
+                    "SENHA_SALVA", "Nova senha adicionada na conta");
         } catch (Exception e) {
             throw new RuntimeException("Erro ao criptografar a senha");
         }
@@ -257,14 +210,14 @@ public class UsuarioService {
 
         return senhasRepository.findByUsuario(usuario).stream()
                 .map(s -> {
-                        try {
-                            return new SenhasResponseDTO(
-                                    s.getId(), s.getDataCriacao(),
-                                    s.getDescricao(), decrypt(s.getSenhaCrypto())
-                            );
-                        } catch (Exception e) {
-                            throw new RuntimeException("Erro ao descriptografar senhas");
-                        }
+                    try {
+                        return new SenhasResponseDTO(
+                                s.getId(), s.getDataCriacao(),
+                                s.getDescricao(), SenhasService.decrypt(s.getSenhaCrypto())
+                        );
+                    } catch (Exception e) {
+                        throw new RuntimeException("Erro ao descriptografar senhas");
+                    }
                 }).toList();
     }
 
@@ -276,6 +229,8 @@ public class UsuarioService {
         if (usuario.getEmail() != null) { usuarioEntity.setEmail(usuario.getEmail()); }
         if (usuario.getSenha() != null && !usuario.getSenha().isBlank()) { usuarioEntity.setSenha(encoder.encode(usuario.getSenha())); }
         repository.saveAndFlush(usuarioEntity);
+        logService.register(usuarioEntity,
+                "ATUALIZACAO_DE_CONTA", "Alterações feitas nas informações de sua conta");
     }
 
     public void deletarUsuarioPorEmail(String email) {
@@ -283,12 +238,16 @@ public class UsuarioService {
     }
 
     public void deletarSenha(String email, int id) {
-        User usuario = repository.findByEmail(email).orElseThrow(
+        User usuarioEntity = repository.findByEmail(email).orElseThrow(
                 () -> new RuntimeException("Usuario não encontrado")
         );
-        SenhasSalvas senhaD = senhasRepository.findByIdAndUsuario(id, usuario).orElseThrow(
-                () -> new RuntimeException("Password not found")
+        SenhasService.deletarSenha(email, id);
+        logService.register(usuarioEntity, "SENHA_DELETADA", "Uma senha foi deletada de sua conta");
+    }
+
+    public User buscarPorEmail(String email) {
+        return repository.findByEmail(email).orElseThrow(
+                () -> new RuntimeException("Usuário não encontrado")
         );
-        senhasRepository.delete(senhaD);
     }
 }

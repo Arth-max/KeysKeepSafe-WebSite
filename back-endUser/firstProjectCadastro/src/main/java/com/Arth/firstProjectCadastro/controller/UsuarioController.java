@@ -18,6 +18,7 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
     private final TokenService tokenService;
+    private static final List<String> EXTENSOES = List.of(".jpeg", ".jpg", ".png", ".svg");
 
     @PostMapping
     public ResponseEntity<Void> salvarUsuario(@RequestBody User usuario) {

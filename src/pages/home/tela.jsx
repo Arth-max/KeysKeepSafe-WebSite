@@ -497,7 +497,7 @@ function Tela() {
                                     
                                 <label> <input type="checkbox" checked={useEspeciais} onChange={(e) => {setUseEspeciais(e.target.checked)}} value="simbolos" id="simbolos" />Simbolos </label>
                             </div>
-                            <input id="Dsenha" type="text" name="senha" placeholder="Descrição da sua senha" ref={inputDescricao}></input>
+                            <input id="Dsenha" autoComplete="descrição" type="text" name="senha" placeholder="Descrição da sua senha" ref={inputDescricao}></input>
                             <input id="Gsenha" type="text" name="senha" placeholder="Sua senha gerada/criada aqui" value={senha} onChange={(e) => setSenha(e.target.value)}></input>
                             <div className="botoes">
                                 <button className="imgButton" onClick={gerarSenha} disabled={loading}> {loading ? "Gerando..." : "Gerar Senha"} </button>
@@ -516,7 +516,7 @@ function Tela() {
                         <div className="confirmSenha" style={{display: tela ? 'flex' : 'none'}}>
                             <p>Digite a sua senha do site (Etapa de segurança)</p>
                             <div className='senhas'>
-                                <input id="Csenha" type={VerSenha ? 'text' : 'password'} name="senha" placeholder="Sua senha" ref={inputConfirmSenha}></input>
+                                <input id="Csenha" autoComplete="current-password" type={VerSenha ? 'text' : 'password'} name="senha" placeholder="Sua senha" ref={inputConfirmSenha}></input>
                                 <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
                             </div>
                             <div className="botoes">

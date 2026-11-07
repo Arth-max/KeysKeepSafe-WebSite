@@ -227,6 +227,8 @@ button:disabled {
   font-size: 14px;
   color: cadetblue;
   text-decoration: none;
+  background: transparent;
+  font-weight: 500;
   cursor: pointer;
   margin-top: -5px;
   transition: 0.2s ease;

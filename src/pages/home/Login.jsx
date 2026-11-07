@@ -4,12 +4,15 @@ import desverSenha from '../../assets/desverSenha.png'
 import Logo from '../../assets/senha.png'
 import './Login.css'
 import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import API, { validarSenha, OpenCloseInputs, OpenCloseDiv, setMsg, clearMsg, clearInputs } from '../../hooks/user.js'
 import Footer from '../../components/Footer/Footer.jsx'
 
-function Home() {
-  const [tela, setTela] = useState('login') //estado da tela (login, cadastro, esqueciSenha)
+function Login() {
+  const Location = useLocation()
+  const inicialTela = Location.state?.tela || 'login'
+
+  const [tela, setTela] = useState(inicialTela) //estado da tela (login, cadastro, esqueciSenha)
   const [VerSenha, setMostrarSenha] = useState(false) //estado da visibilidade da senha
   const [loading, setLoading] = useState(false) //estado do botão
   const navigate = useNavigate() //navegador
@@ -61,6 +64,12 @@ function Home() {
     clearMsg('msgCadastro')
     OpenCloseInputs('email', 'open')
   }
+
+  function telaApresentacao() {
+    navigate('/')
+    clearMsg('msgLogin')
+    clearMsg('msgCadastro')
+  }
   //função para mostrar senha
   function mostrarSenha() {
     setMostrarSenha(!VerSenha)
@@ -71,8 +80,8 @@ function Home() {
   async function findUsers() {
     setLoading(true)
     try {
-      const nome = inputName.current.value
-      const senha = inputSenha.current.value
+      const nome = inputName.current.value.trim()
+      const senha = inputSenha.current.value.trim()
 
       if (nome == '' || senha == '') {
         setMsg('msgLogin', 'Por favor digite todos os campos', 'erro')
@@ -215,8 +224,16 @@ function Home() {
     <div className='App'>
       {/* Botões de cadastro e Login */}
       <div className='botoes'>
+        <button id="btnApresentacao" className='botoesPrincipais' onClick={telaApresentacao}>Sobre</button>
         <button id="btnLogin" className='botoesPrincipais' onClick={telaLogin}>Fazer Login</button>
         <button id="btnCadastro" className='botoesPrincipais' onClick={telaCadastro}>Não possui conta?</button>
+      </div>
+
+      {/* Tela de apresentação */}
+      <div className='apresentacao' style={{ display: tela === 'apresentacao' ? 'flex' : 'none' }}>
+        <main className='mainApresentation'> 
+
+        </main>
       </div>
 
       {/* Tela Login */}
@@ -235,7 +252,7 @@ function Home() {
             <img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" />
           </button>
         </div>
-        <a onClick={forgotPassword} className='a-forgotPass' role="button">Esqueci minha senha</a>
+        <button onClick={forgotPassword} className='a-forgotPass' type="button">Esqueci minha senha</button>
         <button type="submit" className='btn-login' onClick={findUsers} disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
         <p id="msgLogin"></p>
       </form>
@@ -286,4 +303,4 @@ function Home() {
     </div>
   )
 }
-export default Home
+export default Login

@@ -7,7 +7,12 @@
 .apresentation {
     min-height: 100dvh;
     background: linear-gradient(135deg, #0a1f0a 0%, #0d2b1a 40%, #0a1a2e 100%);
-    color: #F4F4F5;
+    animation: appear 0.4s ease-in-out; color: #F4F4F5;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .apresentation-header {
@@ -37,7 +42,7 @@ button:hover {
 }
 
 .ap-btnLC { 
-    background: #2E8B57; border-color: #2E8B57; 
+    background: linear-gradient(to bottom right, #2E8B57, 	#006400); border-color: #2E8B57; 
     color: #fff; padding: 12px 32px; 
     font-size: 17px; align-self: center;
     margin-top: 15px;
@@ -58,7 +63,14 @@ button:hover {
 .apresentation-hero { 
     text-align: center; max-width: 850px; 
     margin: 0 auto; padding: 70px 20px 50px; 
+    animation: side-appear 0.4s ease-in-out;
 }
+
+@keyframes side-appear {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 .apresentation-hero h1 { font-size: clamp(30px, 6vw, 48px); line-height: 1.15; margin: 0 0 16px; }
 .apresentation-hero p { font-size: 18px; color: #A1A1AA; margin: 0 0 28px; }
 
@@ -72,7 +84,11 @@ button:hover {
 .ap-cards { 
     display: grid; 
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
-    gap: 16px;
+    gap: 16px; animation: cards-appear 0.4s ease-in-out;
+}
+@keyframes cards-appear {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .ap-titulo {
@@ -109,6 +125,9 @@ button:hover {
 }
 
 @media (max-width: 600px) {
-  .ap-hero { padding: 40px 16px 30px; }
-  .ap-marca span { display: none; }
+  .apresentation-hero { padding: 40px 16px 30px; }
+  .apresentation-logo span { display: none; }
+  .apresentation-passos { padding: 40px 16px; }
+  .ap-passos { margin-top: 10px; margin-left: 5px; }
+  .ap-btnLC { padding: 12px 24px; width: 100%; }
 }

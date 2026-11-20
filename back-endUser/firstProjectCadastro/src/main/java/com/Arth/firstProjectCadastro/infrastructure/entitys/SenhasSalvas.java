@@ -20,14 +20,14 @@ public class SenhasSalvas {
     private Integer id;
 
     @Column(nullable = false)
-    private String Descricao;
+    private String descricao;
 
     @Column(nullable = false, length = 500)
-    private String SenhaCrypto;
+    private String senhaCrypto;
 
     private LocalDateTime dataCriacao;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario.email", nullable = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private User usuario;
 }

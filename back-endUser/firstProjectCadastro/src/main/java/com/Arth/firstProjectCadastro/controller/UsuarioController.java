@@ -9,13 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URL;
 import java.util.List;
 
 @RestController
 @RequestMapping("/usuario")
 @RequiredArgsConstructor
 public class UsuarioController {
-
     private final UsuarioService usuarioService;
     private final TokenService tokenService;
     private static final List<String> EXTENSOES = List.of(".jpeg", ".jpg", ".png", ".svg");
@@ -32,16 +32,18 @@ public class UsuarioController {
 
     @PostMapping("/login")
     public ResponseEntity<UsuarioResponseDTO> login(@RequestBody LoginDTO login) {
-        try {
-            User usuario = usuarioService.login(login.nome(), login.senha());
-            String token = tokenService.gToken(usuario);
-            return ResponseEntity.ok(new UsuarioResponseDTO(usuario, token));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(401).build();
-        }
+        User usuario = usuarioService.login(login.email(), login.senha());
+        String token = tokenService.gToken(usuario);
+        return ResponseEntity.ok(new UsuarioResponseDTO(usuario, token));
     }
 
-   @PostMapping("/image")
+    @GetMapping
+    public ResponseEntity<UsuarioResponseDTO> buscarUser(Authentication authentication) {
+        User usuario = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(new UsuarioResponseDTO(usuario, null));
+    }
+
+    @PostMapping("/image")
     public ResponseEntity<Void> salvarImagem(@RequestParam String imagemUrl, Authentication authentication) {
         User usuario = (User) authentication.getPrincipal();
         String urLower = imagemUrl.toLowerCase();
@@ -57,7 +59,7 @@ public class UsuarioController {
             return ResponseEntity.badRequest().build();
         }
 
-        usuarioService.salvarImagem(imagemUrl, usuario.getNome());
+        usuarioService.salvarImagem(imagemUrl, usuario.getEmail());
         return ResponseEntity.ok().build();
     }
 
@@ -110,7 +112,7 @@ public class UsuarioController {
     @DeleteMapping("/image")
     public ResponseEntity<Void> deletarImagem(Authentication authentication) {
         User usuario = (User) authentication.getPrincipal();
-        usuarioService.deletarImagem(usuario.getNome());
+        usuarioService.deletarImagem(usuario.getEmail());
         return ResponseEntity.noContent().build();
     }
 
@@ -122,9 +124,12 @@ public class UsuarioController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> atualizarUsuario(Authentication authentication, @RequestBody User usuario) {
+    public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(Authentication authentication, @RequestBody User usuario) {
         User usuarioLogado = (User) authentication.getPrincipal();
         usuarioService.atualizarUsuario(usuarioLogado.getEmail(), usuario);
-        return ResponseEntity.ok().build();
+
+        User usuarioAtualizado = usuarioService.buscarPorEmail(usuario.getEmail() != null ? usuario.getEmail() : usuarioLogado.getEmail());
+        String newToken = tokenService.gToken(usuarioAtualizado);
+        return ResponseEntity.ok(new UsuarioResponseDTO(usuarioAtualizado, newToken));
     }
 }

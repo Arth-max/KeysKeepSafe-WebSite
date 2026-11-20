@@ -28,10 +28,9 @@ API.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             sessionStorage.removeItem('token')
-            if (window.location.pathname == '/') {
-                return
+            if (window.location.pathname !== '/login') {
+                window.location.assign('/login')
             }
-            window.location.href = '/'
         }
         return Promise.reject(error)
     }

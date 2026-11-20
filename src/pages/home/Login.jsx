@@ -18,7 +18,7 @@ function Login() {
   const navigate = useNavigate() //navegador
 
   //login
-  const inputName = useRef()
+  const inputEmail = useRef()
   const inputSenha = useRef()
 
   //cadastro
@@ -38,6 +38,7 @@ function Login() {
       if (!loading) acao()
     }
   }
+
   //Funções relacionadas aos estados da tela\\
   //ativar tela login
   function telaLogin() {
@@ -64,7 +65,7 @@ function Login() {
     clearMsg('msgCadastro')
     OpenCloseInputs('email', 'open')
   }
-
+ //função para direcionar para a tela de apresentação do site
   function telaApresentacao() {
     navigate('/')
     clearMsg('msgLogin')
@@ -78,19 +79,20 @@ function Login() {
   //Funções relacionadas a API\\
   //função fazer login pela API
   async function findUsers() {
-    setLoading(true)
-    try {
-      const nome = inputName.current.value.trim()
-      const senha = inputSenha.current.value.trim()
+    if (loading) return
 
-      if (nome == '' || senha == '') {
+    try {
+      const email = inputEmail.current.value.trim()
+      const senha = inputSenha.current.value
+
+      if (email == '' || senha == '') {
         setMsg('msgLogin', 'Por favor digite todos os campos', 'erro')
-        setLoading(false)
         return
       }
+
       setLoading(true)
       const response = await API.post('/usuario/login', {
-        nome: nome,
+        email: email,
         senha: senha
       })
 
@@ -98,15 +100,24 @@ function Login() {
       
       setMsg('msgLogin', 'Validado com sucesso', 'sucesso')
 
-      inputName.current.value = ''
+      inputEmail.current.value = ''
       inputSenha.current.value = ''
 
       navigate('/tela', {
         state: {
-          usuario: response.data
+          usuario: {
+            nome: response.data.name,
+            email: response.data.email,
+            urlImg: response.data.urlImg
+          }
         }
       })
     } catch (error) {
+      if (error.response?.status === 429) {
+        const seg = error.response.headers['retry-after']
+        setMsg('msgLogin', `Tente novamente em ${seg ?? 'alguns'} segundos`, 'erro')
+        return
+      } 
       setMsg('msgLogin', 'Por favor revise se todos os campos estão corretos', 'erro')
     } finally {
       setLoading(false)
@@ -161,7 +172,7 @@ function Login() {
     }
     setLoading(true)
     try {
-        await API.post('/usuario/recuperar-senha?email', null, {params: {email}})
+        await API.post('/usuario/recuperar-senha?', null, {params: {email}})
         OpenCloseInputs('EnvEmail', 'close')
         OpenCloseInputs('email', 'close')
         OpenCloseInputs('codigo', 'open')
@@ -171,7 +182,7 @@ function Login() {
 
         setMsg('msgEsqueciSenha', 'Um código foi enviado para o seu email', 'sucesso')
     } catch (error) {
-        setMsg('msgEsqueciSenha', 'email não cadastrado ou inválido', 'erro')
+        setMsg('msgEsqueciSenha', 'Se o email estiver cadastrado, você receberá instruções por lá', 'sucesso')
     } finally {
         setLoading(false)
     }
@@ -201,7 +212,11 @@ function Login() {
     }
     setLoading(true)
     try {
-      await API.put('/usuario/atualizarSenha', { senha: Nsenha }, {params: {email, cod}})
+      await API.put('/usuario/atualizarSenha', {
+        email: email,
+        codigo: cod,
+        senha: Nsenha
+      })
 
       Email.current.value = ''
       codigo.current.value = ''
@@ -229,13 +244,6 @@ function Login() {
         <button id="btnCadastro" className='botoesPrincipais' onClick={telaCadastro}>Não possui conta?</button>
       </div>
 
-      {/* Tela de apresentação */}
-      <div className='apresentacao' style={{ display: tela === 'apresentacao' ? 'flex' : 'none' }}>
-        <main className='mainApresentation'> 
-
-        </main>
-      </div>
-
       {/* Tela Login */}
       <form className='login' style={{ display: tela === 'login' ? 'flex' : 'none' }} onSubmit={handleKeyPress(findUsers)}>
         <div className='title'>
@@ -244,7 +252,7 @@ function Login() {
         </div>
         <div className="divider"></div>
         <h2>Login</h2>
-        <input name="name" autoComplete="username" type="text" placeholder='Nome' ref={inputName} />
+        <input name="email" autoComplete="email" type="email" placeholder='Seu Email' ref={inputEmail} />
 
         <div className='senhas'>
           <input name="senha" autoComplete="current-password" type={VerSenha ? 'text' : 'password'} placeholder='Senha' ref={inputSenha} />
@@ -253,7 +261,7 @@ function Login() {
           </button>
         </div>
         <button onClick={forgotPassword} className='a-forgotPass' type="button">Esqueci minha senha</button>
-        <button type="submit" className='btn-login' onClick={findUsers} disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
+        <button type="submit" className='btn-login' disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
         <p id="msgLogin"></p>
       </form>
 
@@ -265,14 +273,14 @@ function Login() {
         </div>
         <div className="divider"></div>
         <h2>Faça seu Cadastro!</h2>
-        <input name="name" autoComplete="username" type="text" placeholder='Nome' ref={CinputName} />
-        <input name="Email" autoComplete="Email" type="email" placeholder='Email' ref={CinputEmail} />
+        <input name="name" autoComplete="name" type="text" placeholder='Nome' ref={CinputName} />
+        <input name="Email" autoComplete="email" type="email" placeholder='Email' ref={CinputEmail} />
 
         <div className='senhas'>
           <input name="senha" autoComplete="new-password" type={VerSenha ? 'text' : 'password'} placeholder='Senha' ref={CinputSenha} />
           <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
         </div>
-        <button className="btn-cadastro" type="submit" onClick={createUsers} disabled={loading}>{loading ? 'Cadastrando...' : 'Cadastrar'}</button>
+        <button className="btn-cadastro" type="submit" disabled={loading}>{loading ? 'Cadastrando...' : 'Cadastrar'}</button>
         <p id="msgCadastro"></p>
       </form>
 
@@ -284,9 +292,9 @@ function Login() {
         </div>
         <div className="divider"></div>
         <h2>Redefinir senha</h2>
-        <input id='email' autoComplete="current-email" name="Email" type="email" placeholder='Digite seu Email' ref={Email} />
+        <input id='email' autoComplete="email" name="Email" type="email" placeholder='Digite seu Email' ref={Email} />
 
-        <input id='codigo' autoComplete="cod-email" className='beforeCodigo' type="number" placeholder='Digite o código enviado pelo email' ref={codigo} />
+        <input id='codigo' className='beforeCodigo' type="text" inputMode='numeric' maxLength={6} placeholder='Digite o código enviado pelo email' ref={codigo} />
         
         {/* Div para criar nova senha */}
         <div id="pass" className='senhasBC'>

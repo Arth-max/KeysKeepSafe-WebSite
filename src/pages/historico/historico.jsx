@@ -9,7 +9,7 @@ import '../historico/historico.css'
 //Função para rotular o dia corretamente
 function rotuloDia(iso) {
     const d = new Date(iso)
-    if (Number.isNaN(d)) return "Sem data"
+    if (Number.isNaN(d.getTime())) return "Sem data"
 
     const hoje = new Date()
     const ontem = new Date()
@@ -40,11 +40,12 @@ function Historico() {
     }
 
     useEffect(() => {
-        setError('')
         let ativo = true
 
         //Função para carregar os logs do Backend
         async function getLogs() {
+            setLoading(true)
+            setError('')
             try {
                 const data = await buscarLogs()
                 if (ativo) setLogs(data ?? [])
@@ -55,8 +56,6 @@ function Historico() {
         }
 
         getLogs()
-        .then(() => setTentativa(tentativa + 1))
-        .catch(err => console.log(err))
 
         return () => { ativo = false }
     }, [tentativa])
@@ -83,7 +82,7 @@ function Historico() {
             map.get(dia).push(log)
         }
         return [...map.entries()]
-    }, [logs, categorias, apenasHoje, navigate])
+    }, [logs, categorias, apenasHoje])
 
     //Contante de verificação se tem algum filtro
     const temFiltro = categorias !== 'ALL' || apenasHoje

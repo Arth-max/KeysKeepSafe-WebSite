@@ -40,7 +40,6 @@ function Tela() {
     const [senha, setSenha] = useState('')
     const [pass, setSavePass] = useState([])
     const [senhaVisivel, setSenhaVisivel] = useState(null)
-    const [logs, setLogs] = useState([])
 
     //Estados dos inputs
     const inputConfirmSenha = useRef()
@@ -56,11 +55,22 @@ function Tela() {
     const handleRange = (event) => {
         setValor(Number(event.target.value))
     }
+
+    //Introdução da tecla Enter
+    function handleKeyPress(acao) {
+        return (e) => {
+            e.preventDefault()
+            if (!loading) acao()
+        }
+    }
+
     //Função para Deslogar o usuário
     function voltar() {
-        setImg('')
-        navigate('/')
         sessionStorage.removeItem('token')
+        navigate('/login')
+        setSavePass([])
+        setSenhaVisivel(null)
+        setImg('')
     }
     //Função para mudar o tema principal do site
     function changeColor() {
@@ -140,6 +150,8 @@ function Tela() {
     //Função para voltar da tela Senhas Salvas para tela principal
     function voltarSS() {
         setSenhasSalvas(false)
+        setSavePass([])
+        setSenhaVisivel(null)
         clearInputs('Csenha')
         clearMsg('msgCS')
     }
@@ -242,6 +254,10 @@ function Tela() {
         } else {
             try {
                 await API.delete(`/usuario`)
+
+                sessionStorage.removeItem('token')
+                setSavePass([])
+                setSenhaVisivel(null)
                 alert("Usuário deletado com sucesso!")
                 navigate('/')
             } catch (error) {
@@ -278,7 +294,13 @@ function Tela() {
             }
             clearMsg('msgCS')
         } catch (error) {
-            setMsg('msgCS', 'Senha incorreta', 'erro')
+            if (error.response?.status == 401) {
+                setMsg('msgCS', 'Senha incorreta', 'erro')
+            } else if (error.response?.status == 429) {
+                setMsg('msgCS', 'Muitas tentativas feitas, tente novamente mais tarde', 'erro')
+            } else {
+                setMsg('msgCS', 'Não foi possível verificar sua senha. Tente novamente', 'erro')
+            }
         } finally {
             setLoading(false)
         }
@@ -308,17 +330,15 @@ function Tela() {
 
     //Função para salvar a senha(API)
     async function salvarSenha() {
-        setLoading(true)
+        if (loading) return
         const descricao = inputDescricao.current.value
 
         if (descricao === "") {
             setMsg('msgGS', 'Por favor digite uma descrição', 'erro')
-            setLoading(false)
             return
         }
         if (senha === "") {
             setMsg('msgGS', 'Por favor gere ou crie uma senha', 'erro')
-            setLoading(false)
             return
         }
 
@@ -346,26 +366,25 @@ function Tela() {
 
     //Função para deletar a senha criada/gerada(API)
     async function deletarSenha(id) {
-        setLoading(true)
+        if (loading) return
         const confirm = window.confirm("Deseja realmente deletar essa senha?")
 
         if (!confirm) { 
-            setLoading(false)
             return 
         }
 
+        setLoading(true)
         try {
             await API.delete(`/usuario/deletar-senha?id=${encodeURIComponent(id)}`)
-            setSavePass(prev => {
-                const novasSenhas = prev.filter(item => item.id !== id)
 
-                if (novasSenhas.length === 0) {
-                    setMsg('msgSS', 'Você não possui nenhuma senha salva', 'erro')
-                } else {
-                    setMsg('msgSS', 'Senha deletada com sucesso', 'sucesso')
-                }
-                return novasSenhas
-            })
+            setSavePass = (prev => prev.filter(item => item.id != id))
+            const restantes = pass.filter(item => item.id != id)
+
+            if (restantes.length === 0) {
+                setMsg('msgSS', 'Você não possui nenhuma senha salva', 'erro')
+            } else {
+                setMsg('msgSS', 'Senha deletada com sucesso', 'erro')
+            }
 
             setSenhaVisivel(null)
         } catch (error) {
@@ -377,6 +396,8 @@ function Tela() {
 
     //mantém os dados atualizados mesmo após sofrer efeitos por navegador
     useEffect(() => {
+        let ativo = true
+
         const token = sessionStorage.getItem('token')
         if (!token) {
             navigate('/')
@@ -386,15 +407,23 @@ function Tela() {
         async function loadUser() {
             try {
                 const response = await API.get(`/usuario`)
+                if (!ativo) return
+
                 setUsuario(response.data)
                 setNome(response.data.nome ?? '')
                 setEmail(response.data.email ?? '')
-                setBackgroundImg(response.data.urlImg ?? '')
+                const url = response.data.urlImg ?? ''
+                setBackgroundImg(validarImagem(url) ? url : '')
         } catch (error) {
-            console.error("Erro ao carregar o usuário: ", error)
+            if (ativo) {
+                console.error("Erro ao carregar o usuário: ", error)
+            }
         }
     }
         void loadUser()
+        return () => {
+            ativo = false
+        }
     }, [navigate])
 
     return (
@@ -501,7 +530,7 @@ function Tela() {
                             <input id="Gsenha" type="text" name="senha" placeholder="Sua senha gerada/criada aqui" value={senha} onChange={(e) => setSenha(e.target.value)}></input>
                             <div className="botoes">
                                 <button className="imgButton" onClick={gerarSenha} disabled={loading}> {loading ? "Gerando..." : "Gerar Senha"} </button>
-                                <button className="saveButton" onClick={salvarSenha}> Salvar Senha </button>
+                                <button className="saveButton" onClick={salvarSenha} disabled={loading}> {loading ? "Salvando..." : "Salvar Senha"} </button>
                                 <button onClick={voltarGS}> Voltar </button>
                             </div>
                             <p id="msgGS"></p>
@@ -513,18 +542,20 @@ function Tela() {
                 {/* Tela para confirmar senha */}
                 {tela && (
                     <div className="overlay">
-                        <div className="confirmSenha" style={{display: tela ? 'flex' : 'none'}}>
-                            <p>Digite a sua senha do site (Etapa de segurança)</p>
-                            <div className='senhas'>
-                                <input id="Csenha" autoComplete="current-password" type={VerSenha ? 'text' : 'password'} name="senha" placeholder="Sua senha" ref={inputConfirmSenha}></input>
-                                <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
+                        <form onSubmit={handleKeyPress(confirmSenha)}>
+                            <div className="confirmSenha" style={{display: tela ? 'flex' : 'none'}}>
+                                <p>Digite a sua senha do site (Etapa de segurança)</p>
+                                <div className='senhas'>
+                                    <input id="Csenha" autoComplete="current-password" type={VerSenha ? 'text' : 'password'} name="senha" placeholder="Sua senha" ref={inputConfirmSenha}></input>
+                                    <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
+                                </div>
+                                <div className="botoes">
+                                    <button className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
+                                    <button onClick={voltarSGSenhas}> Voltar </button>
+                                </div>
+                                <p id="msgCS"></p>
                             </div>
-                            <div className="botoes">
-                                <button className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
-                                <button onClick={voltarSGSenhas}> Voltar </button>
-                            </div>
-                            <p id="msgCS"></p>
-                        </div>
+                        </form>
                     </div>
                 )}
 
@@ -542,7 +573,7 @@ function Tela() {
                                         <button type="button" onClick={() => mostrarSenhas(item.id)}>
                                             <img className="LCEImg" src={senhaVisivel === item.id ? desverSenha : verSenha} alt=""/>
                                         </button>
-                                        <button type="button" onClick={() => deletarSenha(item.id)}>
+                                        <button type="button" onClick={() => deletarSenha(item.id)} disabled={loading}>
                                             <img className="LCEImg" src={Lixeira} alt="Deletar Senha"/>
                                         </button>
                                         </div>

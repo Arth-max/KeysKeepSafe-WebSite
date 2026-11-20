@@ -1,19 +1,10 @@
 package com.Arth.firstProjectCadastro.infrastructure.entitys;
 
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import lombok.*;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Table(name = "Usuario")
 @Entity()
@@ -29,16 +20,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email", unique = true, nullable = false, length = 255)
     private String email;
 
-    @Column(name = "nome")
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @Column(name = "senha")
+    @Column(name = "senha", nullable = false, length = 255)
     private String senha;
 
-    private Integer codigoRecuperacao;
+    private String codigoRecuperacao;
     private LocalDateTime codExpiracao;
     private String urlImg;
 }

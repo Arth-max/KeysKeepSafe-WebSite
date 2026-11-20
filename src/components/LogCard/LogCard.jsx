@@ -12,7 +12,7 @@ function formatarAcao(acao) {
 function LogCard({ log }) {
     const cfg = ACOES[log.acao] ?? ACAO_PADRAO;
     const data = log.horario ? new Date(log.horario) : null
-    const hora = data && !Number.isNaN(data) ? data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Horário desconhecido";
+    const hora = data && !Number.isNaN(data.getTime()) ? data.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Horário desconhecido";
 
     return (
         /* Componente LogCard */

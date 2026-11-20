@@ -1,14 +1,17 @@
+//importações de imagens, arquivos e funções
 import { useNavigate } from 'react-router-dom'
 import Logo from '../../assets/senha.png'
 import Footer from '../../components/Footer/Footer.jsx'
 import './Apresentation.css'
 
+//Recursos do site
 const RECURSOS = [
     { icone: '🔑', rotulo: 'Gerador de Senhas', descricao: 'Crie senhas fortes e seguras à sua maneira com facilidade.' },
     { icone: '🔒', rotulo: 'Cofre de Senhas', descricao: 'Armazene suas senhas com segurança, identificando-as facilmente com uma descrição.' },
     { icone: '⏱️', rotulo: 'Historico de ações', descricao: 'Suas ações são salvas e podem ser consultadas em qualquer momento por você (informações privadas não incluidas).' }
 ]
 
+//Passo a passo do usuário
 const PASSOS = [
     'Crie sua conta com poucos segundos.',
     'Crie, Gere ou salve uma senha que você já usa ',
@@ -20,6 +23,7 @@ function Apresentation() {
 
     return (
         <div className="apresentation">
+            {/* Cabecalho da apresentação */}
             <header className="apresentation-header">
                 <div className="apresentation-logo">
                     <img src={Logo} alt="" />
@@ -33,6 +37,7 @@ function Apresentation() {
             </header>
 
             <main>
+                {/* Seção principal da apresentação */}
                 <section className="apresentation-hero">
                     <h1>Suas senhas, na palma da mão, com segurança, em um lugar só</h1>
                     <p> Gere, guarde e consulte suas senhas com facilidade com KeysKeepSafe</p>

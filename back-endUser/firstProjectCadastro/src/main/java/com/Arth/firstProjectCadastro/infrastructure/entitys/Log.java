@@ -26,7 +26,7 @@ public class Log {
     private String acao;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name="usuario.id", nullable = false)
+    @JoinColumn(name="usuario_id", nullable = false)
     private User usuario;
 
     @Column

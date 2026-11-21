@@ -47,7 +47,7 @@
   width: 100%;
 
   color: #222;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.8);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -66,9 +66,13 @@
     background: linear-gradient(to bottom right, rgba(46, 139, 87, 0.3), rgba(30, 144, 255, 0.3));
     border-color: rgba(46, 139, 87, 0.5);
     box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+
+    button {
+      background: rgba(0, 128, 0, 0.7);
+    }
 }
 .AppBlank .card p {
-    color: gainsboro;
+    color: white;
 }
 .AppBlank .principal h1 {
     color: rgba(255, 255, 255, 0.9);
@@ -97,10 +101,13 @@
     border: 1px solid rgba(150, 30, 30, 0.6);
 }
 .AppBlank .configurations {
-  background: rgba(128, 128, 128, 0.6);
+  background: rgba(105, 105, 105, 0.6);
 }
 .AppBlank .configurations h2 {
   color: rgba(0, 0, 0, 0.7);
+}
+.AppBlank .configurations input {
+  background: rgba(105, 105, 105, 0.3);
 }
 .AppBlank .geradorSenha {
   background: rgba(128, 128, 128, 0.6);

@@ -549,7 +549,7 @@ function Tela() {
                                 <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
                             </div>
                             <div className="botoes">
-                                <button className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
+                                <button form="confirm" type="submit" className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
                                 <button onClick={voltarSGSenhas}> Voltar </button>
                             </div>
                                 <p id="msgCS"></p>

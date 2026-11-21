@@ -13,7 +13,7 @@ function Login() {
   const inicialTela = Location.state?.tela || 'login'
 
   const [tela, setTela] = useState(inicialTela) //estado da tela (login, cadastro, esqueciSenha)
-  const [VerSenha, setMostrarSenha] = useState(false) //estado da visibilidade da senha
+  const [VerSenha, setVerSenha] = useState(false) //estado da visibilidade da senha
   const [loading, setLoading] = useState(false) //estado do botão
   const navigate = useNavigate() //navegador
 
@@ -73,7 +73,7 @@ function Login() {
   }
   //função para mostrar senha
   function mostrarSenha() {
-    setMostrarSenha(!VerSenha)
+    setVerSenha(!VerSenha)
   }
 
   //Funções relacionadas a API\\

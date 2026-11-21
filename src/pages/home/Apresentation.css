@@ -125,7 +125,7 @@ button:hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .apresentaion, .apresentation-hero, .ap-cards {
+    .apresentation, .apresentation-hero, .ap-cards {
         animation: none;
     }
 }

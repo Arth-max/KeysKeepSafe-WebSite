@@ -41,7 +41,12 @@ function Historico() {
 
     useEffect(() => {
         let ativo = true
-
+        const token = sessionStorage.getItem('token')
+        if (!token) {
+            navigate('/')
+            return
+        }
+        
         //Função para carregar os logs do Backend
         async function getLogs() {
             setLoading(true)

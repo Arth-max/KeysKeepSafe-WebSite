@@ -34,11 +34,11 @@ function Tela() {
     const [gerador, setGerador] = useState(false)
     const [senhasSalvas, setSenhasSalvas] = useState(false)
     const [changeTheme, setChangeTheme] = useState(false)
-    const [VerSenha, setMostrarSenha] = useState(false)
-    const [Sol, setSun] = useState(false)
+    const [VerSenha, setVerSenha] = useState(false)
+    const [Sol, setSol] = useState(false)
     const [img, setImg] = useState('')
     const [senha, setSenha] = useState('')
-    const [pass, setSavePass] = useState([])
+    let [pass, setPass] = useState([])
     const [senhaVisivel, setSenhaVisivel] = useState(null)
 
     //Estados dos inputs
@@ -68,14 +68,14 @@ function Tela() {
     function voltar() {
         sessionStorage.removeItem('token')
         navigate('/login')
-        setSavePass([])
+        setPass([])
         setSenhaVisivel(null)
         setImg('')
     }
     //Função para mudar o tema principal do site
     function changeColor() {
         setTemaClaro(prev => !prev)
-        setSun(prev => !prev)
+        setSol(prev => !prev)
     }
     //Abrir tela para mudar a imagem de fundo do site
     function mudarTema() {
@@ -141,7 +141,7 @@ function Tela() {
 
     //Função para mostrar ou esconder a senha
     function mostrarSenha() {
-        setMostrarSenha(!VerSenha)
+        setVerSenha(!VerSenha)
     }
     //Função para mostrar ou esconder as senhas exclusivamente da tela Senhas Salvas
     function mostrarSenhas(id) {
@@ -150,7 +150,7 @@ function Tela() {
     //Função para voltar da tela Senhas Salvas para tela principal
     function voltarSS() {
         setSenhasSalvas(false)
-        setSavePass([])
+        setPass([])
         setSenhaVisivel(null)
         clearInputs('Csenha')
         clearMsg('msgCS')
@@ -256,7 +256,7 @@ function Tela() {
                 await API.delete(`/usuario`)
 
                 sessionStorage.removeItem('token')
-                setSavePass([])
+                setPass([])
                 setSenhaVisivel(null)
                 alert("Usuário deletado com sucesso!")
                 navigate('/')
@@ -284,7 +284,7 @@ function Tela() {
             setMsg('msgCS', 'Validado com sucesso', 'sucesso')
 
             const SenhaResponse = await API.get(`/usuario/buscar-senhas`)
-            setSavePass(SenhaResponse.data)
+            setPass(SenhaResponse.data)
             
             setTela(false)
             setSenhasSalvas(true)
@@ -377,7 +377,7 @@ function Tela() {
         try {
             await API.delete(`/usuario/deletar-senha?id=${encodeURIComponent(id)}`)
 
-            setSavePass = (prev => prev.filter(item => item.id != id))
+            setPass = (prev => prev.filter(item => item.id != id))
             const restantes = pass.filter(item => item.id != id)
 
             if (restantes.length === 0) {
@@ -526,8 +526,8 @@ function Tela() {
                                     
                                 <label> <input type="checkbox" checked={useEspeciais} onChange={(e) => {setUseEspeciais(e.target.checked)}} value="simbolos" id="simbolos" />Simbolos </label>
                             </div>
-                            <input id="Dsenha" autoComplete="descrição" type="text" name="senha" placeholder="Descrição da sua senha" ref={inputDescricao}></input>
-                            <input id="Gsenha" type="text" name="senha" placeholder="Sua senha gerada/criada aqui" value={senha} onChange={(e) => setSenha(e.target.value)}></input>
+                            <input id="Dsenha" type="text" name="senha" placeholder="Descrição da sua senha" ref={inputDescricao}></input>
+                            <input id="Gsenha" type="text" name="senha" autoComplete="current-password" placeholder="Sua senha gerada/criada aqui" value={senha} onChange={(e) => setSenha(e.target.value)}></input>
                             <div className="botoes">
                                 <button className="imgButton" onClick={gerarSenha} disabled={loading}> {loading ? "Gerando..." : "Gerar Senha"} </button>
                                 <button className="saveButton" onClick={salvarSenha} disabled={loading}> {loading ? "Salvando..." : "Salvar Senha"} </button>
@@ -541,22 +541,20 @@ function Tela() {
 
                 {/* Tela para confirmar senha */}
                 {tela && (
-                    <div className="overlay">
-                        <form onSubmit={handleKeyPress(confirmSenha)}>
-                            <div className="confirmSenha" style={{display: tela ? 'flex' : 'none'}}>
-                                <p>Digite a sua senha do site (Etapa de segurança)</p>
-                                <div className='senhas'>
-                                    <input id="Csenha" autoComplete="current-password" type={VerSenha ? 'text' : 'password'} name="senha" placeholder="Sua senha" ref={inputConfirmSenha}></input>
-                                    <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
-                                </div>
-                                <div className="botoes">
-                                    <button className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
-                                    <button onClick={voltarSGSenhas}> Voltar </button>
-                                </div>
-                                <p id="msgCS"></p>
+                    <form id="confirm" className="overlay" onSubmit={handleKeyPress(confirmSenha)}>
+                        <div className="confirmSenha" style={{display: tela ? 'flex' : 'none'}}>
+                            <p>Digite a sua senha do site (Etapa de segurança)</p>
+                            <div className='senhas'>
+                                <input id="Csenha" autoComplete="current-password" type={VerSenha ? 'text' : 'password'} name="senha" placeholder="Sua senha" ref={inputConfirmSenha}></input>
+                                <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
                             </div>
-                        </form>
-                    </div>
+                            <div className="botoes">
+                                <button className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
+                                <button onClick={voltarSGSenhas}> Voltar </button>
+                            </div>
+                                <p id="msgCS"></p>
+                        </div>
+                    </form>
                 )}
 
                 {/* Tela Senhas Salvas */}

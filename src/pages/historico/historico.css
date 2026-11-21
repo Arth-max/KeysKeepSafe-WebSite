@@ -44,16 +44,21 @@
     width: 100%; border: 1px solid var(--borda); 
     box-sizing: border-box;
     background: linear-gradient(135deg, rgba(0, 100, 0, 0.5), #0d2b1a, rgba(46, 139, 87, 0.2));
-    color: #D4D4D8; font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    color: 	#F4F4F5; font-size: 14px; font-weight: 600;
+    cursor: pointer; 
 }
 .chip-voltar {
     padding: 11px 15px; border-radius: 9px;
     width: 100%; border: 1px solid var(--borda); 
     box-sizing: border-box; font-size: 14px; font-weight: 600;
     cursor: pointer; 
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
+@media(prefers-reduced-motion: no-preference) {
+    .chip, .chip-voltar {
+        transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    }
+}
+
 .chip-voltar:hover { opacity: 0.8; transform: translateY(-4px); }
 .chip:hover { 
     background: rgba(46, 139, 87, 0.6); border-color: var(--destaque); 
@@ -61,7 +66,7 @@
 }
 .chip.ativo { 
     background: linear-gradient(135deg, rgba(0, 255, 127, 0.4), rgba(60, 179, 113, 0.4), rgba(46, 139, 87, 0.4)); 
-    border-color: lightgreen; color: #fff;
+    border-color: lightgreen; color: #000000;
 }
 .chip-hoje.ativo { align-self: center; background: #166530; border-color: #22C55E; margin: 10px; }
 .chip:focus-visible { outline: 2px solid var(--destaque); outline-offset: 2px; }

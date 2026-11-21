@@ -51,6 +51,7 @@ export function validarImagem(url) {
                 parseUrl.protocol === 'http:' || parseUrl.protocol === 'https:' 
             )
         } catch (error) {
+            console.log(`Imagem não validada: ${error}`)
             return false
         }
     }
@@ -75,7 +76,7 @@ export function setMsg(id, mensagem, tipo) {
 //função para validar senha conforme regras
 export function validarSenha(senha) {
     return (
-      /[0-9]/.test(senha) && /[A-Z]/.test(senha) && /[a-z]/.test(senha)
+      /\d/.test(senha) && /[A-Z]/.test(senha) && /[a-z]/.test(senha)
       && /[!@#$%^&*()\-_=+[{\]}|;:'"<>.,/?~]/.test(senha)
     )
   }

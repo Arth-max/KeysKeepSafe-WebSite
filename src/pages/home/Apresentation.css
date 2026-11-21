@@ -42,7 +42,7 @@ button:hover {
 }
 
 .ap-btnLC { 
-    background: linear-gradient(to bottom right, #2E8B57, 	#006400); border-color: #2E8B57; 
+    background: linear-gradient(to bottom right, #008000, #006400); border-color: #2E8B57; 
     color: #fff; padding: 12px 32px; 
     font-size: 17px; align-self: center;
     margin-top: 15px;
@@ -53,7 +53,7 @@ button:hover {
 .pri { 
     background: #2E8B57; 
     border-color: #2E8B57; 
-    color: #fff; 
+    color: #000000; 
     align-self: center;
 }
 .pri:hover { background: #25754A; transform: translateY(-4px); }
@@ -122,6 +122,12 @@ button:hover {
 
 .ap-cta {
     text-align: center; padding-bottom: 70px; 
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .apresentaion, .apresentation-hero, .ap-cards {
+        animation: none;
+    }
 }
 
 @media (max-width: 600px) {

@@ -10,7 +10,12 @@
     border: 1px solid var(--borda, #353541);
     border-left: 3px solid var(--tom);
     border-radius: 12px;
-    transition: background 0.2s, transform 0.2s ease, border-color 0.2s ease;
+}
+
+@media(prefers-reduced-motion: no-preference) {
+    .log-card {
+        transition: background 0.2s, transform 0.2s ease, border-color 0.2s ease;
+    }
 }
 
 .log-card:hover { background: rgba(46, 139, 87, 0.3); transform: translateY(-4px); }

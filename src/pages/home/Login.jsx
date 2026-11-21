@@ -294,7 +294,7 @@ function Login() {
         <h2>Redefinir senha</h2>
         <input id='email' autoComplete="email" name="Email" type="email" placeholder='Digite seu Email' ref={Email} />
 
-        <input id='codigo' className='beforeCodigo' type="text" inputMode='numeric' maxLength={6} placeholder='Digite o código enviado pelo email' ref={codigo} />
+        <input id='codigo' autoComplete="one-time-code" className='beforeCodigo' type="text" inputMode='numeric' maxLength={6} placeholder='Digite o código enviado pelo email' ref={codigo} />
         
         {/* Div para criar nova senha */}
         <div id="pass" className='senhasBC'>

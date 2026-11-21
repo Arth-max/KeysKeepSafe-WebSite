@@ -55,7 +55,7 @@ function Historico() {
             } finally { if (ativo) setLoading(false) }
         }
 
-        getLogs()
+        void getLogs()
 
         return () => { ativo = false }
     }, [tentativa])
@@ -90,17 +90,19 @@ function Historico() {
     return (
         <div className="historico-container">
             {/* Filtros de categorias */}
-            <div className="filtros" role="group" aria-label="Filtrar atividades">
-                {CATEGORIAS.map((c) => (
-                    <button key={c.id}
-                        type="button"
-                        className={`chip ${categorias === c.id ? "ativo" : ""}`}
-                        aria-pressed={categorias === c.id}
-                        onClick={() => setCategorias(c.id)}>
-                        {c.rotulo}
-                    </button>
-                ))}
-                <button className="chip-voltar" onClick={voltar}>Voltar</button>
+            <div role="listbox">
+                <div className="filtros" role="group" aria-label="Filtrar atividades">
+                    {CATEGORIAS.map((c) => (
+                        <button key={c.id}
+                            type="button"
+                            className={`chip ${categorias === c.id ? "ativo" : ""}`}
+                            aria-pressed={categorias === c.id}
+                            onClick={() => setCategorias(c.id)}>
+                            {c.rotulo}
+                        </button>
+                    ))}
+                    <button className="chip-voltar" onClick={voltar}>Voltar</button>
+                </div>
             </div>
 
             {/* Apresentação dos Logs*/}

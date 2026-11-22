@@ -1,15 +1,22 @@
 package com.Arth.firstProjectCadastro.controller;
 
+import com.Arth.firstProjectCadastro.business.ImageService;
 import com.Arth.firstProjectCadastro.business.TokenService;
 import com.Arth.firstProjectCadastro.business.UsuarioService;
 import com.Arth.firstProjectCadastro.infrastructure.DTOs.*;
 import com.Arth.firstProjectCadastro.infrastructure.entitys.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URL;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -18,7 +25,7 @@ import java.util.List;
 public class UsuarioController {
     private final UsuarioService usuarioService;
     private final TokenService tokenService;
-    private static final List<String> EXTENSOES = List.of(".jpeg", ".jpg", ".png", ".svg");
+    private final ImageService imageService;
 
     @PostMapping
     public ResponseEntity<Void> salvarUsuario(@RequestBody User usuario) {
@@ -43,35 +50,35 @@ public class UsuarioController {
         return ResponseEntity.ok(new UsuarioResponseDTO(usuario, null));
     }
 
-    @PostMapping("/image")
-    public ResponseEntity<Void> salvarImagem(@RequestParam String imagemUrl, Authentication authentication) {
-        User usuario = (User) authentication.getPrincipal();
-        String urLower = imagemUrl.toLowerCase();
-        boolean extensaoV = EXTENSOES.stream().anyMatch(urLower::endsWith);
-
-        if (!extensaoV) {
-            return ResponseEntity.status(415).build();
-        }
-
-        try {
-            new URL(imagemUrl);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        usuarioService.salvarImagem(imagemUrl, usuario.getEmail());
+    @PostMapping(value = "/imagem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> salvarImagem(@AuthenticationPrincipal User usuario,
+                                             @RequestParam("file") MultipartFile file) throws IOException {
+        usuarioService.salvarImagem(usuario.getEmail(), file);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/buscar-senhas")
-    public ResponseEntity<List<SenhasResponseDTO>> searchSenhas(Authentication authentication) {
-        User usuario = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(usuarioService.searchSenhas(usuario.getEmail()));
+    @GetMapping("/imagem")
+    public ResponseEntity<Resource> VerImagem(@AuthenticationPrincipal User usuario) {
+        String nome = usuario.getUrlImg();
+        Resource r = imageService.carregar(nome);
+        MediaType tipo = nome.endsWith(".png") ? MediaType.IMAGE_PNG : MediaType.IMAGE_JPEG;
+
+        return ResponseEntity.ok().contentType(tipo)
+                .header("X-Content-Type-Options", "nosniff")
+                .cacheControl(CacheControl.noStore())
+                .header(HttpHeaders.VARY, "Authorization")
+                .body(r);
     }
 
     @PostMapping("/recuperar-senha")
     public ResponseEntity<Void> recuperarSenhaEmail(@RequestParam String email) {
         usuarioService.recuperarSenhaEmail(email);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/atualizarSenha")
+    public ResponseEntity<Void> atualizarSenha(@RequestParam String email, @RequestParam int cod, @RequestBody NewSenhaDTO novaSenha) {
+        usuarioService.atualizarSenha(email, cod, novaSenha.senha());
         return ResponseEntity.ok().build();
     }
 
@@ -82,17 +89,17 @@ public class UsuarioController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/atualizarSenha")
-    public ResponseEntity<Void> atualizarSenha(@RequestParam String email, @RequestParam int cod, @RequestBody NewSenhaDTO novaSenha) {
-        usuarioService.atualizarSenha(email, cod, novaSenha.senha());
-        return ResponseEntity.ok().build();
-    }
-
     @PostMapping("/gerar-senha")
     public ResponseEntity<String> gerarSenha(@RequestBody GerarSenhaDTO senhaGerada) {
         String senha = usuarioService.gerarSenha(senhaGerada.tamanho(), senhaGerada.numeros(), senhaGerada.maiusculas(),
                 senhaGerada.minusculas(), senhaGerada.especiais());
         return ResponseEntity.ok(senha);
+    }
+
+    @GetMapping("/buscar-senhas")
+    public ResponseEntity<List<SenhasResponseDTO>> searchSenhas(Authentication authentication) {
+        User usuario = (User) authentication.getPrincipal();
+        return ResponseEntity.ok(usuarioService.searchSenhas(usuario.getEmail()));
     }
 
     @PostMapping("/salvar-senha")
@@ -106,6 +113,7 @@ public class UsuarioController {
     public ResponseEntity<Void> deletarUsuarioPorEmail(Authentication authentication) {
         User usuario = (User) authentication.getPrincipal();
         usuarioService.deletarUsuarioPorEmail(usuario.getEmail());
+        imageService.apagar(usuario.getUrlImg());
         return ResponseEntity.noContent().build();
     }
 

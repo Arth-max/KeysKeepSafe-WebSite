@@ -42,20 +42,6 @@ export async function buscarLogs() {
     return response.data;
 }
 
-//Restringe urls para apenas requisições http e https
-export function validarImagem(url) {
-        try {
-            const parseUrl = new URL(url)
-
-            return (
-                parseUrl.protocol === 'http:' || parseUrl.protocol === 'https:' 
-            )
-        } catch (error) {
-            console.log(`Imagem não validada: ${error}`)
-            return false
-        }
-    }
-
 //Abre e fecha inputs
 export function OpenCloseInputs(id, tipo) {
     const ID = document.getElementById(id)
@@ -69,7 +55,7 @@ export function setMsg(id, mensagem, tipo) {
     const msg = document.getElementById(id)
     if (!msg) return
 
-    msg.style.color = tipo === 'sucesso' ? 'seagreen' : 'darkred'
+    msg.style.color = tipo === 'sucesso' ? 'darkgreen' : 'darkred'
     msg.textContent = mensagem
 }
 

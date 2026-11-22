@@ -10,7 +10,7 @@ import desverSenha from '../../assets/desverSenha.png'
 import verSenha from '../../assets/verSenha.png'
 import Logo from '../../assets/senha.png'
 import Relogio from '../../assets/relogio.png'
-import API, { validarImagem, setMsg, OpenCloseInputs, clearMsg, clearInputs } from '../../hooks/user.js'
+import API, { setMsg, OpenCloseInputs, clearMsg, clearInputs } from '../../hooks/user.js'
 import { useState, useRef, useEffect } from 'react'
 import Footer from '../../components/Footer/Footer.jsx'
 
@@ -23,7 +23,7 @@ function Tela() {
     const [usuario, setUsuario] = useState(inicialUser)
     const [nome, setNome] = useState(inicialUser.nome ?? '')
     const [email, setEmail] = useState(inicialUser.email ?? '')
-    const [backgroundImg, setBackgroundImg] = useState(inicialUser.urlImg || '')
+    const [backgroundImg, setBackgroundImg] = useState('')
 
     //Estados da tela (cards, botões, inputs, senhas, etc)
     const [loading, setLoading] = useState(false)
@@ -36,9 +36,8 @@ function Tela() {
     const [changeTheme, setChangeTheme] = useState(false)
     const [VerSenha, setVerSenha] = useState(false)
     const [Sol, setSol] = useState(false)
-    const [img, setImg] = useState('')
     const [senha, setSenha] = useState('')
-    let [pass, setPass] = useState([])
+    const [pass, setPass] = useState([])
     const [senhaVisivel, setSenhaVisivel] = useState(null)
 
     //Estados dos inputs
@@ -49,6 +48,7 @@ function Tela() {
     const [useEspeciais, setUseEspeciais] = useState(false)
     const [useMaiusculas, setUseMaiusculas] = useState(false)
     const [useMinusculas, setUseMinusculas] = useState(false)
+    const MAX = 2 * 1024 * 1024
 
     //Funções relacionadas aos estados da tela\\
     //Função que atualizar o range do gerador de senhas
@@ -70,7 +70,6 @@ function Tela() {
         navigate('/login')
         setPass([])
         setSenhaVisivel(null)
-        setImg('')
     }
     //Função para mudar o tema principal do site
     function changeColor() {
@@ -157,35 +156,39 @@ function Tela() {
     }
 
     //Funções relacionadas a API\\
-    //Função para mudar a imagem de fundo(API)
-    async function changeImg() {
-        const imageUrl = encodeURIComponent(img)
-        if (!img.trim()) { return; }
+    //Função para enviar o arquivo da imagem de fundo(API)
+    async function sendImage(e) {
+        const input = e.target
+        const file = e.target.files[0]
+        if (!file) return
 
-        if (!validarImagem(img)) {
-            setMsg('msgImg', 'URL inválida', 'erro')
-            return
+        if (!['image/png', 'image/jpeg'].includes(file.type)) {
+            return setMsg('msgImg', 'Use uma imagem PNG ou JPG', 'erro')
         }
 
-        ///verifica se a url é válida
-        try {
-            new URL(img)
-        } catch (error) {
-            setMsg('msgImg', 'URL inválida', 'erro')
-            return
+         if (file.size > MAX) {
+            return setMsg('msgImg', 'A imagem deve ter no máximo 2MB', 'erro')
         }
+
+        const form = new FormData()
+        form.append('file', file)
+
         try {
-            await API.post(`/usuario/image?imagemUrl=${imageUrl}`)
-            setBackgroundImg(img)
-            setUsuario({
-                ...usuario,
-                urlImg: img
-            })
-            setImg('')
-            setMsg('msgImg', 'Imagem de fundo aplicada com sucesso', 'sucesso')
+            await API.post('/usuario/imagem', form)
+            setBackgroundImg(await loadBackground())
+            e.target.value = ''
+            setMsg('msgImg', 'Imagem adicionada com sucesso', 'sucesso')
         } catch (error) {
-            setMsg('msgImg', 'Erro ao aplicar imagem de fundo, por favor tente novamente', 'erro')
+            setMsg('msgImg', error.response?.status === 413 ? 'Imagem muito grande' : 'Não foi possível envia imagem', 'erro')
+        } finally {
+            input.value = ''
         }
+    }
+
+    //Função para carregar a imagem de fundo 
+    async function loadBackground() {
+        const resp = await API.get('/usuario/imagem', { responseType: 'blob'})
+        return URL.createObjectURL(resp.data)
     }
 
     //Função para remover a imagem de fundo(API)
@@ -193,7 +196,6 @@ function Tela() {
         try {
             await API.delete(`/usuario/image`)
             setBackgroundImg('')
-            setImg('')
             setMsg('msgImg', 'Imagem de fundo removida com sucesso', 'sucesso')
         } catch (error) {
             setMsg('msgImg', 'Erro ao remover imagem de fundo, tente novamente', 'erro')
@@ -377,13 +379,13 @@ function Tela() {
         try {
             await API.delete(`/usuario/deletar-senha?id=${encodeURIComponent(id)}`)
 
-            setPass = (prev => prev.filter(item => item.id != id))
+            setPass(prev => prev.filter(item => item.id != id))
             const restantes = pass.filter(item => item.id != id)
 
             if (restantes.length === 0) {
                 setMsg('msgSS', 'Você não possui nenhuma senha salva', 'erro')
             } else {
-                setMsg('msgSS', 'Senha deletada com sucesso', 'erro')
+                setMsg('msgSS', 'Senha deletada com sucesso', 'sucesso')
             }
 
             setSenhaVisivel(null)
@@ -412,8 +414,15 @@ function Tela() {
                 setUsuario(response.data)
                 setNome(response.data.nome ?? '')
                 setEmail(response.data.email ?? '')
-                const url = response.data.urlImg ?? ''
-                setBackgroundImg(validarImagem(url) ? url : '')
+
+                if (response.data.urlImg) {
+                    const url = await loadBackground()
+                    if (!ativo) {
+                        URL.revokeObjectURL(url)
+                        return
+                    }
+                    setBackgroundImg(url)
+                }
         } catch (error) {
             if (ativo) {
                 console.error("Erro ao carregar o usuário: ", error)
@@ -425,6 +434,10 @@ function Tela() {
             ativo = false
         }
     }, [navigate])
+
+    useEffect(() => {
+        return () => { if (backgroundImg) URL.revokeObjectURL(backgroundImg) }
+    }, [backgroundImg])
 
     return (
         <div id="main" className={temaClaro ? 'AppBlank' : 'App'} style={backgroundImg ? { backgroundImage: `url(${backgroundImg})` } : {}}>
@@ -449,8 +462,8 @@ function Tela() {
             {/* Mudar imagem de fundo */}
             <div id="changeTheme" className="configurations" style={{ display: changeTheme ? 'flex' : 'none' }}>
                 <label htmlFor="imgUrl">Mudar Imagem de fundo</label>
-                <input id="imgUrl" type="url" placeholder="Url da imagem" value={img} onChange={(e) => setImg(e.target.value)} />
-                {img.trim() !== '' && <button id="ApImg" className="imgButton" onClick={changeImg}> Aplicar </button>}
+                <label htmlFor="File" className="btn-file">Escolher Arquivo</label>
+                <input id="File" type="file" accept="image/png, image/jpeg" onChange={sendImage} className="input-file"/>
                 {backgroundImg && <button id="DelImg" className="delImgButton" onClick={removeImg}> Remover Imagem </button>}
                 <p id="msgImg"></p>
             </div>
@@ -549,8 +562,8 @@ function Tela() {
                                 <button type="button" className='divSenhas' onClick={mostrarSenha}><img className="LCEImg" src={VerSenha ? desverSenha : verSenha} alt="" /></button>
                             </div>
                             <div className="botoes">
-                                <button form="confirm" type="submit" className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
-                                <button onClick={voltarSGSenhas}> Voltar </button>
+                                <button form="confirm" type="button" className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
+                                <button type="button" onClick={voltarSGSenhas}> Voltar </button>
                             </div>
                                 <p id="msgCS"></p>
                         </div>

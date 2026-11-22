@@ -32,6 +32,7 @@ public class LimitFilter extends OncePerRequestFilter {
             "POST /usuario/login",           new Rule("login", 5, 60_000),
             "POST /usuario",                 new Rule("cadastro", 5, 3_600_000),
             "POST /usuario/recuperar-senha", new Rule("recuperar", 3, 600_000),
+            "POST /usuario/imagem",          new Rule("imagem", 10, 600_000),
             "PUT /usuario/atualizarSenha", new Rule("atualizar", 5, 600_000)
     );
 

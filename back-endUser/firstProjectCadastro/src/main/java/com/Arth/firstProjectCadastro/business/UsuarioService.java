@@ -6,10 +6,14 @@ import com.Arth.firstProjectCadastro.infrastructure.entitys.SenhasSalvas;
 import com.Arth.firstProjectCadastro.infrastructure.repositorys.LogsRepository;
 import com.Arth.firstProjectCadastro.infrastructure.repositorys.SenhasRepository;
 import com.Arth.firstProjectCadastro.infrastructure.repositorys.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -25,6 +30,7 @@ public class UsuarioService {
     private final EmailService EmailService;
     private final SenhasService SenhasService;
     private final LogService logService;
+    private final ImageService imageService;
     private final SenhasRepository senhasRepository;
     private final LogsRepository logsRepository;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
@@ -34,13 +40,14 @@ public class UsuarioService {
 
     public UsuarioService(UsuarioRepository repository, EmailService EmailService,
                           SenhasRepository senhasRepository, LogsRepository logsRepository, SenhasService SenhasService,
-                          LogService logService) {
+                          LogService logService, ImageService imageService) {
         this.EmailService = EmailService;
         this.repository = repository;
         this.senhasRepository = senhasRepository;
         this.logsRepository = logsRepository;
         this.SenhasService = SenhasService;
         this.logService = logService;
+        this.imageService = imageService;
     }
 
     public void salvarUsuario(User usuario) {
@@ -59,10 +66,14 @@ public class UsuarioService {
                     "Muitas tentativas. Tente novamente em alguns minutos");
         }
 
-        User usuario = repository.findByEmail(email).orElseThrow(() -> {
-            log.warn("Falha no login: Usuário não encontrado");
-            return new RuntimeException("Email não encontrado");
-        });
+        User usuario = repository.findByEmail(email.trim()).orElse(null);
+        if (usuario == null || !encoder.matches(senha, usuario.getSenha())) {
+            loginAttempt.failed(id);
+            if (usuario != null) {
+                logService.register(usuario, "LOGIN_BAD", "Tentativa de login mal-sucedida");
+                throw new RuntimeException("E-mail ou senha incorretos");
+            }
+        }
 
         if (!encoder.matches(senha, usuario.getSenha())) {
             log.warn("Falha no login: Senha incorreta (usuarioId={})", usuario.getId());
@@ -77,26 +88,26 @@ public class UsuarioService {
         }
     }
 
-    public void salvarImagem(String image, String email) {
-        log.debug("Salvando imagem");
-        User usuario = repository.findByEmail(email).orElseThrow(() -> {
-            log.warn("Falha na tentativa de salvar imagem: usuário não encontrado");
-            return new RuntimeException("Usuário não encontrado");
-        });
+    @Transactional
+    public void salvarImagem(String email, MultipartFile file) throws IOException {
+        User usuario = repository.findByEmail(email).orElseThrow(
+                () -> new RuntimeException("Usuário não encontrado")
+        );
+        String urlAntiga = usuario.getUrlImg();
+        usuario.setUrlImg(imageService.salvar(file));
+        repository.save(usuario);
 
-        usuario.setUrlImg(image);
-        repository.saveAndFlush(usuario);
-        log.info("Imagem salva (usuarioId={})", usuario.getId());
-        logService.register(usuario, "IMAGEM_ADICIONADA",
-                "Uma imagem foi adicionado ao fundo do site de sua conta");
+        imageService.apagar(urlAntiga);
+        logService.register(usuario, "IMAGEM_ADICIONADA", "Uma imagem foi adicionada ao fundo do site do seu perfil");
     }
 
     public void deletarImagem(String email) {
         User usuario = repository.findByEmail(email).orElseThrow(
                 () -> new RuntimeException("Usuário não encontrado")
         );
+        imageService.apagar(usuario.getUrlImg());
         usuario.setUrlImg(null);
-        repository.saveAndFlush(usuario);
+        repository.save(usuario);
         log.info("Imagem deletada (usuarioId={})", usuario.getId());
         logService.register(usuario, "IMAGEM_DELETADA",
                 "Uma imagem de fundo da sua conta foi deletada");
@@ -124,6 +135,8 @@ public class UsuarioService {
             log.warn("Erro ao atualizar senha: Usuário não encontrado");
             return new RuntimeException("Usuario não encontrado");
         });
+        String codigoEsperado = usuarioEntity.getCodigoRecuperacao();
+        String codigoInformado = String.valueOf(cod);
 
         if (usuarioEntity.getCodigoRecuperacao() == null || usuarioEntity.getCodExpiracao() == null) {
             log.warn("Erro ao atualizar a senha: Código inexistente");
@@ -137,7 +150,7 @@ public class UsuarioService {
             log.warn("Código expirado (usuarioId={})", usuarioEntity.getId());
             throw new RuntimeException("Código expirado");
         }
-        if (!usuarioEntity.getCodigoRecuperacao().equals(cod)) {
+        if (!MessageDigest.isEqual(codigoEsperado.getBytes(StandardCharsets.UTF_8), codigoInformado.getBytes(StandardCharsets.UTF_8))) {
             log.warn("Código inválido (usuarioId={})", usuarioEntity.getId());
             throw new RuntimeException("Código inválido");
         }
@@ -302,7 +315,7 @@ public class UsuarioService {
         });
 
         SenhasService.deletarSenha(email, id);
-        log.info("Senha deletada (usuarioId={}", usuarioEntity.getId());
+        log.info("Senha deletada (usuarioId={})", usuarioEntity.getId());
         logService.register(usuarioEntity, "SENHA_DELETADA", "Uma senha foi deletada de sua conta");
     }
 

@@ -93,7 +93,7 @@ button:hover {
 
 .ap-titulo {
     background: #1C1C22; border: 1px solid #353541; 
-    border-radius: 16px; padding: 24px; transition: 0.3s ease;
+    border-radius: 16px; padding: 24px; transition: all 0.3s ease;
 }
 .ap-titulo:hover {
     background: linear-gradient(to bottom right, rgba(46, 139, 87, 0.5), rgba(30, 144, 255, 0.5));

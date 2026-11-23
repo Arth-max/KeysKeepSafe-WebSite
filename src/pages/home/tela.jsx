@@ -14,6 +14,12 @@ import API, { setMsg, OpenCloseInputs, clearMsg, clearInputs } from '../../hooks
 import { useState, useRef, useEffect } from 'react'
 import Footer from '../../components/Footer/Footer.jsx'
 
+//Função para carregar a imagem de fundo 
+async function loadBackground() {
+    const resp = await API.get('/usuario/imagem', { responseType: 'blob'})
+    return URL.createObjectURL(resp.data)
+}
+
 function Tela() {
     const Location = useLocation() //Estado local
     const navigate = useNavigate() //navegador
@@ -183,12 +189,6 @@ function Tela() {
         } finally {
             input.value = ''
         }
-    }
-
-    //Função para carregar a imagem de fundo 
-    async function loadBackground() {
-        const resp = await API.get('/usuario/imagem', { responseType: 'blob'})
-        return URL.createObjectURL(resp.data)
     }
 
     //Função para remover a imagem de fundo(API)
@@ -563,7 +563,7 @@ function Tela() {
                             </div>
                             <div className="botoes">
                                 <button form="confirm" type="button" className="imgButton" onClick={confirmSenha} disabled={loading}> {loading ? "Verificando..." : "Confirmar Senha"} </button>
-                                <button type="button" onClick={voltarSGSenhas}> Voltar </button>
+                                <button form="confirm" type="button" onClick={voltarSGSenhas}> Voltar </button>
                             </div>
                                 <p id="msgCS"></p>
                         </div>
